@@ -50,4 +50,6 @@ Extract all datasets into `./data` directory.
 * `Edible wild plants` - [Edible wild plants](https://www.kaggle.com/gverzea/edible-wild-plants)
 ![wild](./img/wild-plants.png)
 * `Plants_Dataset` - [Plants_Dataset[99 classes]](https://www.kaggle.com/muhammadjawad1998/plants-dataset99-classes?select=Plant_Data)
+![wild](./img/plants.png)
 * `Marvel Heroes` - [Marvel Heroes](https://www.kaggle.com/hchen13/marvel-heroes)
+![wild](./img/marvel.png)
