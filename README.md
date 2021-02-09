@@ -9,6 +9,8 @@ pip install  -r requirements.txt
 jupyter notebook
 ```
 
+If you want to work on the same datasets download them using references in [Datasets Section](#datasets).
+
 ## List of Notebooks
 
 - `Resnet18 IG NoiseTunnel.ipynb` - Integrated Gradients base explanation
@@ -19,6 +21,7 @@ jupyter notebook
 ## Example:
 
 ![IG Noise Tunnel](./img/ig_nt_result.png)
+
 IG with Noise Tunnel
 
 ## References
@@ -35,8 +38,13 @@ Image Classification Models and Saliency Maps, K. Simonyan, et. al. 2014](https:
 
 ## Datasets
 
-* `Edible wild plants` - [Edible wild plants](https://www.kaggle.com/gverzea/edible-wild-plants)
-* `Plants_Dataset` - [Plants_Dataset[99 classes]](https://www.kaggle.com/muhammadjawad1998/plants-dataset99-classes?select=Plant_Data)
-* `Fruits 360` - [Fruits 360 - Mihai Oltean, Horea Muresan](https://www.kaggle.com/moltean/fruits)
-* `Marvel Heroes` - [Marvel Heroes](https://www.kaggle.com/hchen13/marvel-heroes)
+Extract all datasets into `./data` directory.
+
 * `Stanford Dogs Dataset` - [Stanford Dogs Dataset](https://www.kaggle.com/jessicali9530/stanford-dogs-dataset)
+![dogs](./img/dogs.png)
+* `Food 101` - [Food 101 - Foodspotting](https://www.kaggle.com/kmader/food41)
+![food101](./img/food101.png)
+* `Edible wild plants` - [Edible wild plants](https://www.kaggle.com/gverzea/edible-wild-plants)
+![wild](./img/wild-plants.png)
+* `Plants_Dataset` - [Plants_Dataset[99 classes]](https://www.kaggle.com/muhammadjawad1998/plants-dataset99-classes?select=Plant_Data)
+* `Marvel Heroes` - [Marvel Heroes](https://www.kaggle.com/hchen13/marvel-heroes)
