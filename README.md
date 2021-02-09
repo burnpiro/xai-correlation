@@ -17,6 +17,9 @@ If you want to work on the same datasets download them using references in [Data
 - `Resnet18 Deconvolution.ipynb` - Deconvolution base explanation
 - `Resnet18 GBP.ipynb` - Guided Backpropagation base explanation
 - `Resnet18 Saliency.ipynb` - Saliency base explanation
+- `dataset_eda/Stanford Dogs.ipynb` - EDA Stanford Dogs dataset
+- `dataset_eda/Food 101.ipynb` - EDA Food 101 dataset
+- `dataset_eda/Edible wild plants.ipynb` - EDA Edible wild plants dataset
 
 ## Example:
 
