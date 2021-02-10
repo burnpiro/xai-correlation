@@ -2,3 +2,5 @@ notebook
 captum
 matplotlib
 numpy
+pandas
+scikit-image
