@@ -7,6 +7,7 @@ from skimage import io, transform
 from torch.utils.data import Dataset, DataLoader
 from PIL import ImageFile, Image
 from torchvision import transforms, utils
+
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 DATASETS = {
@@ -24,6 +25,17 @@ PATHS = {
     DATASETS["plant-data"]: "Plant_Data/Plant_Data",
     DATASETS["stanford-dogs"]: "Stanford Dogs Dataset/images/Images",
 }
+
+
+def get_default_transformation():
+    return transforms.Compose(
+        [
+            transforms.Resize(224),
+            transforms.CenterCrop(224),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        ]
+    )
 
 
 def get_edible_plants_data(base_path="data/Edible wild plants/datasets"):
@@ -262,24 +274,16 @@ class CustomDataset(Dataset):
             )
 
         if dataset == DATASETS["food101"]:
-            train_df, test_df = get_food101_data(
-                os.path.join(root_dir, PATHS[dataset])
-            )
+            train_df, test_df = get_food101_data(os.path.join(root_dir, PATHS[dataset]))
 
         if dataset == DATASETS["marvel"]:
-            train_df, test_df = get_marvel_data(
-                os.path.join(root_dir, PATHS[dataset])
-            )
+            train_df, test_df = get_marvel_data(os.path.join(root_dir, PATHS[dataset]))
 
         if dataset == DATASETS["plant-data"]:
-            train_df, test_df = get_plants_data(
-                os.path.join(root_dir, PATHS[dataset])
-            )
+            train_df, test_df = get_plants_data(os.path.join(root_dir, PATHS[dataset]))
 
         if dataset == DATASETS["stanford-dogs"]:
-            train_df, test_df = get_dogs_data(
-                os.path.join(root_dir, PATHS[dataset])
-            )
+            train_df, test_df = get_dogs_data(os.path.join(root_dir, PATHS[dataset]))
 
         self.data = train_df if data_type == "train" else test_df
         self.transformer = transformer
@@ -299,6 +303,15 @@ class CustomDataset(Dataset):
         :return List[string]
         """
         return self._classes_df.label.unique()
+
+    @property
+    def classes_map(self):
+        """
+        Get mapping for predicted classes
+
+        :return: Dict[int: List[string]] Map for all classes
+        """
+        return {str(i): [className] for i, className in enumerate(self.classes)}
 
     def __getitem__(self, idx):
         """
