@@ -11,6 +11,19 @@ jupyter notebook
 
 If you want to work on the same datasets download them using references in [Datasets Section](#datasets).
 
+## Training models
+
+```shell
+python train_model.py --model_version=resnet18 --dataset=edible-plants
+```
+
+##### Parameters:
+- `model_version`: version of the model [`resnet18`, `resnet50`]
+- `dataset`: version of the dataset [`edible-plants`, `food101`, `marvel`, `plant-data`, `stanford-dogs`]
+
+### Saved Model output:
+`models/saved_models/{model_version}-{dataset}/`
+
 ## List of Notebooks
 
 - `Resnet18 IG NoiseTunnel.ipynb` - Integrated Gradients base explanation
