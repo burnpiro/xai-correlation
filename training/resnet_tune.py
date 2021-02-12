@@ -1,39 +1,24 @@
 from __future__ import print_function, division
-import os
 import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.optim import lr_scheduler
-import pandas as pd
-from skimage import io, transform
-import numpy as np
-import matplotlib.pyplot as plt
-from torch.utils.data import Dataset, DataLoader
-from torchvision import transforms, utils, datasets, models
+from torch.utils.data import Dataset
+from torchvision import transforms
 
-from training.helpers import train_model, visualize_model
+from training.helpers import train_model
 from models.resnet import create_resnet18_model, create_resnet50_model
+from data.datasets import CustomDataset, get_default_transformation
 
 # Ignore warnings
 import warnings
 
 warnings.filterwarnings("ignore")
-
-from training.datasets import CustomDataset, DATASETS
-
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 
 def train_resnet(dataset, model_type="resnet18", data_dir=None):
-    data_transform = transforms.Compose(
-        [
-            transforms.Resize(224),
-            transforms.CenterCrop(224),
-            transforms.ToTensor(),
-            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-        ]
-    )
-
+    data_transform = get_default_transformation()
     train_dataset = CustomDataset(
         dataset=dataset,
         transformer=data_transform,

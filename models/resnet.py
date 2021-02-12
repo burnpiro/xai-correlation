@@ -1,7 +1,6 @@
-import torch
 import torch.nn as nn
-from torchvision import transforms, utils, datasets, models
-from training.datasets import DATASETS
+from torchvision import models
+from data.datasets import DATASETS
 
 NUM_OF_CLASSES = {
     DATASETS["edible-plants"]: 62,
