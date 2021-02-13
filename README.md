@@ -22,7 +22,19 @@ python train_model.py --model_version=resnet18 --dataset=edible-plants
 - `dataset`: version of the dataset [`edible-plants`, `food101`, `marvel`, `plant-data`, `stanford-dogs`]
 
 ### Saved Model output:
-`models/saved_models/{model_version}-{dataset}/`
+`models/saved_models/{model_version}-{dataset}.pth`
+
+## Test models
+
+```shell
+python test_model.py --model_version=resnet18 --dataset=edible-plants
+```
+
+##### Parameters:
+- `model_version`: version of the model [`resnet18`, `resnet50`]
+- `dataset`: version of the dataset [`edible-plants`, `food101`, `marvel`, `plant-data`, `stanford-dogs`]
+- `weights`: (optional) path to `.pth` file with saved model, if none pasted then default one is used (`models/saved_models/{model_version}-{dataset}.pth`)
+
 
 ## List of Notebooks
 

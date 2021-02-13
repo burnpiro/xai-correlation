@@ -4,6 +4,7 @@ import os
 import copy
 import matplotlib.pyplot as plt
 import numpy as np
+from tqdm import tqdm
 
 
 def train_model(model, dataloaders, criterion, optimizer, scheduler, device, num_epochs=25):
@@ -29,7 +30,12 @@ def train_model(model, dataloaders, criterion, optimizer, scheduler, device, num
             running_corrects = 0
 
             # Iterate over data.
+            bar_format = "{l_bar}{bar}{r_bar}"
+            if phase != "train":
+                bar_format = "{l_bar}{bar}| [{elapsed}<{remaining}, {rate_fmt}{postfix}]"
+            pbar = tqdm(total=len(dataloaders[phase]), desc=f"Epoch {phase}", bar_format=bar_format)
             for inputs, labels in dataloaders[phase]:
+                pbar.update(1)
                 inputs = inputs.to(device)
                 labels = labels.to(device)
 
@@ -51,6 +57,8 @@ def train_model(model, dataloaders, criterion, optimizer, scheduler, device, num
                 # statistics
                 running_loss += loss.item() * inputs.size(0)
                 running_corrects += torch.sum(preds == labels.data)
+
+            pbar.close()
             if phase == 'train':
                 scheduler.step()
 
