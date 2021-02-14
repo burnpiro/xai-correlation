@@ -36,6 +36,20 @@ python test_model.py --model_version=resnet18 --dataset=edible-plants
 - `weights`: (optional) path to `.pth` file with saved model, if none pasted then default one is used (`models/saved_models/{model_version}-{dataset}.pth`)
 
 
+## Measure metrics for models
+
+Calculate Infidelity and Sensitivity values for given model and dataset. Measures are calculated for every method available.
+
+```shell
+python measure_model.py --model_version=resnet18 --dataset=edible-plants
+```
+
+##### Parameters:
+- `model_version`: version of the model [`resnet18`, `resnet50`]
+- `dataset`: version of the dataset [`edible-plants`, `food101`, `marvel`, `plant-data`, `stanford-dogs`]
+- `weights`: (optional) path to `.pth` file with saved model, if none pasted then default one is used (`models/saved_models/{model_version}-{dataset}.pth`)
+
+
 ## List of Notebooks
 
 - `Resnet18 IG NoiseTunnel.ipynb` - Integrated Gradients base explanation
