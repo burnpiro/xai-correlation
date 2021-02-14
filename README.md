@@ -38,7 +38,7 @@ python test_model.py --model_version=resnet18 --dataset=edible-plants
 
 ## Measure metrics for models
 
-Calculate Infidelity and Sensitivity values for given model and dataset. Measures are calculated for every method available.
+Calculate Infidelity and Sensitivity values for given model and dataset. Measures are calculated for every method available. All experiments are stored in: `experiments/{dataset}/{model_version}/{metohod}/...`
 
 ```shell
 python measure_model.py --model_version=resnet18 --dataset=edible-plants
