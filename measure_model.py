@@ -4,7 +4,10 @@ import torch
 from absl import app, flags
 from pathlib import Path
 from data.datasets import DATASETS
-from models.measure_helpers import measure_model
+from models.measure_helpers import measure_model, METHODS
+import warnings
+
+warnings.filterwarnings("ignore")
 
 FLAGS = flags.FLAGS
 
@@ -32,20 +35,30 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 
 def main(_argv):
-    weights_dir = os.path.join(model_folder, f"{FLAGS.model_version}-{FLAGS.dataset}.pth")
+    weights_dir = os.path.join(
+        model_folder, f"{FLAGS.model_version}-{FLAGS.dataset}.pth"
+    )
     if FLAGS.weights is not None:
         weights_dir = FLAGS.weights
 
-    Path(os.path.join(out_folder, FLAGS.dataset, FLAGS.model_version)).mkdir(
-        parents=True, exist_ok=True
-    )
-    measure_model(
-        FLAGS.model_version,
-        FLAGS.dataset,
-        os.path.join(out_folder, FLAGS.dataset, FLAGS.model_version),
-        weights_dir,
-        device,
-    )
+    for method in [
+        METHODS["ig"],
+        METHODS["sailency"],
+        METHODS["gradcam"],
+        METHODS["deconv"],
+        METHODS["gbp"],
+    ]:
+        Path(
+            os.path.join(out_folder, FLAGS.dataset, FLAGS.model_version, method)
+        ).mkdir(parents=True, exist_ok=True)
+        measure_model(
+            FLAGS.model_version,
+            FLAGS.dataset,
+            os.path.join(out_folder, FLAGS.dataset, FLAGS.model_version, method),
+            weights_dir,
+            device,
+            method=method,
+        )
 
 
 if __name__ == "__main__":
