@@ -52,7 +52,7 @@ def save_cm(cm, labels, filename, figsize=(40, 40)):
 def classification_report_latex(report, filename="report.txt"):
     df = pd.DataFrame(report).transpose()
     with open(filename, "w") as tf:
-        tf.write(df.to_latex())
+        tf.write(df.to_latex(float_format="%.2f"))
 
 
 def test_model(model_version, dataset, out_folder, weights_dir, device):
@@ -79,8 +79,8 @@ def test_model(model_version, dataset, out_folder, weights_dir, device):
 
     preds = []
     labels = []
-    print(f'Testing {model_version} on {dataset} dataset')
-    print('-' * 10)
+    print(f"Testing {model_version} on {dataset} dataset")
+    print("-" * 10)
     pbar = tqdm(total=test_dataset.__len__(), desc="Model test completion")
     for input, label in data_loader:
         input = input.to(device)
@@ -105,4 +105,6 @@ def test_model(model_version, dataset, out_folder, weights_dir, device):
         filename=os.path.join(out_folder, f"{model_version}-{dataset}.txt"),
     )
 
-    print(f'Artifacts stored at {os.path.join(out_folder, f"{model_version}-{dataset}")}.*')
+    print(
+        f'Artifacts stored at {os.path.join(out_folder, f"{model_version}-{dataset}")}.*'
+    )

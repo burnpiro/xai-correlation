@@ -38,6 +38,17 @@ def get_default_transformation():
     )
 
 
+def get_inverse_normalization_transformation():
+    return transforms.Compose(
+        [
+            transforms.Normalize(
+                mean=[0.0, 0.0, 0.0], std=[1 / 0.229, 1 / 0.224, 1 / 0.225]
+            ),
+            transforms.Normalize(mean=[-0.485, -0.456, -0.406], std=[1.0, 1.0, 1.0]),
+        ]
+    )
+
+
 def get_edible_plants_data(base_path="data/Edible wild plants/datasets"):
     train_base = os.path.join(base_path, "dataset")
 
