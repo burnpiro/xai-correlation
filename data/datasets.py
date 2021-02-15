@@ -270,6 +270,7 @@ class CustomDataset(Dataset):
         transformer=None,
         data_type="train",
         root_dir=None,
+        step=1
     ):
         """
         Args:
@@ -278,6 +279,7 @@ class CustomDataset(Dataset):
             transformer (callable, optional): Optional transform to be applied
                 on a sample.
             data_type (string): "train" or "test"
+            step (int, optional): if different than 1 then data is iterated with given step
         """
         if dataset == DATASETS["edible-plants"]:
             train_df, test_df = get_edible_plants_data(
@@ -297,6 +299,8 @@ class CustomDataset(Dataset):
             train_df, test_df = get_dogs_data(os.path.join(root_dir, PATHS[dataset]))
 
         self.data = train_df if data_type == "train" else test_df
+        if step != 1:
+            self.data = self.data.iloc[::step, :]
         self.transformer = transformer
         self._classes_df = self.data.drop_duplicates(subset=["class"])
 

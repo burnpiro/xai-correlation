@@ -51,6 +51,13 @@ def main(_argv):
         Path(
             os.path.join(out_folder, FLAGS.dataset, FLAGS.model_version, method)
         ).mkdir(parents=True, exist_ok=True)
+        step = 1
+        if FLAGS.dataset == DATASETS['food101']:
+            step = 5
+        if FLAGS.dataset == DATASETS['stanford-dogs']:
+            step = 2
+        if FLAGS.dataset == DATASETS['plant-data']:
+            step = 2
         measure_model(
             FLAGS.model_version,
             FLAGS.dataset,
@@ -58,6 +65,7 @@ def main(_argv):
             weights_dir,
             device,
             method=method,
+            step=step
         )
 
 

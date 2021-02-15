@@ -59,7 +59,8 @@ def measure_model(
     weights_dir,
     device,
     method=METHODS["ig"],
-    sample_images=25,
+    sample_images=50,
+    step=1,
 ):
     invTrans = get_inverse_normalization_transformation()
     data_dir = os.path.join("data")
@@ -81,6 +82,7 @@ def measure_model(
         transformer=get_default_transformation(),
         data_type="test",
         root_dir=data_dir,
+        step=step
     )
     data_loader = torch.utils.data.DataLoader(
         test_dataset, batch_size=1, shuffle=False, num_workers=4
