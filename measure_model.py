@@ -26,9 +26,9 @@ flags.DEFINE_enum(
 )
 flags.DEFINE_enum(
     "train_skip",
-    "100%",
+    None,
     list(SPLIT_OPTIONS.keys()),
-    f"Dataset name, one of available datasets: {list(SPLIT_OPTIONS.keys())}",
+    f"(optional) version of the train dataset size: {list(SPLIT_OPTIONS.keys())}",
 )
 flags.DEFINE_string(
     "weights",
@@ -42,38 +42,53 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 
 def main(_argv):
-    weights_dir = os.path.join(
-        model_folder, f"{FLAGS.model_version}-{FLAGS.dataset}-{FLAGS.train_skip}.pth"
-    )
-    if FLAGS.weights is not None:
-        weights_dir = FLAGS.weights
-
-    for method in [
-        METHODS["ig"],
-        METHODS["sailency"],
-        METHODS["gradcam"],
-        METHODS["deconv"],
-        METHODS["gbp"],
-    ]:
-        Path(
-            os.path.join(out_folder, FLAGS.dataset, f"{FLAGS.model_version}-{FLAGS.train_skip}", method)
-        ).mkdir(parents=True, exist_ok=True)
-        step = 1
-        if FLAGS.dataset == DATASETS['food101']:
-            step = 5
-        if FLAGS.dataset == DATASETS['stanford-dogs']:
-            step = 2
-        if FLAGS.dataset == DATASETS['plant-data']:
-            step = 2
-        measure_model(
-            FLAGS.model_version,
-            FLAGS.dataset,
-            os.path.join(out_folder, FLAGS.dataset, f"{FLAGS.model_version}-{FLAGS.train_skip}", method),
-            weights_dir,
-            device,
-            method=method,
-            step=step
+    items = SPLIT_OPTIONS
+    if FLAGS.train_skip is not None:
+        items = {FLAGS.train_skip: SPLIT_OPTIONS[FLAGS.train_skip]}
+    for label, skip in items.items():
+        weights_dir = os.path.join(
+            model_folder,
+            f"{FLAGS.model_version}-{FLAGS.dataset}-{label}.pth",
         )
+        if FLAGS.weights is not None and FLAGS.train_skip is None:
+            weights_dir = FLAGS.weights
+
+        for method in [
+            METHODS["ig"],
+            METHODS["sailency"],
+            METHODS["gradcam"],
+            METHODS["deconv"],
+            METHODS["gbp"],
+        ]:
+            Path(
+                os.path.join(
+                    out_folder,
+                    FLAGS.dataset,
+                    f"{FLAGS.model_version}-{label}",
+                    method,
+                )
+            ).mkdir(parents=True, exist_ok=True)
+            step = 1
+            if FLAGS.dataset == DATASETS["food101"]:
+                step = 5
+            if FLAGS.dataset == DATASETS["stanford-dogs"]:
+                step = 2
+            if FLAGS.dataset == DATASETS["plant-data"]:
+                step = 2
+            measure_model(
+                FLAGS.model_version,
+                FLAGS.dataset,
+                os.path.join(
+                    out_folder,
+                    FLAGS.dataset,
+                    f"{FLAGS.model_version}-{label}",
+                    method,
+                ),
+                weights_dir,
+                device,
+                method=method,
+                step=step,
+            )
 
 
 if __name__ == "__main__":
