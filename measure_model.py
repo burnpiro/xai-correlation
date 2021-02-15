@@ -4,6 +4,7 @@ import torch
 from absl import app, flags
 from pathlib import Path
 from data.datasets import DATASETS
+from models.resnet import SPLIT_OPTIONS
 from models.measure_helpers import measure_model, METHODS
 import warnings
 
@@ -23,6 +24,12 @@ flags.DEFINE_enum(
     list(DATASETS.keys()),
     f"Dataset name, one of available datasets: {list(DATASETS.keys())}",
 )
+flags.DEFINE_enum(
+    "train_skip",
+    "100%",
+    list(SPLIT_OPTIONS.keys()),
+    f"Dataset name, one of available datasets: {list(SPLIT_OPTIONS.keys())}",
+)
 flags.DEFINE_string(
     "weights",
     None,
@@ -36,7 +43,7 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 def main(_argv):
     weights_dir = os.path.join(
-        model_folder, f"{FLAGS.model_version}-{FLAGS.dataset}.pth"
+        model_folder, f"{FLAGS.model_version}-{FLAGS.dataset}-{FLAGS.train_skip}.pth"
     )
     if FLAGS.weights is not None:
         weights_dir = FLAGS.weights
@@ -49,7 +56,7 @@ def main(_argv):
         METHODS["gbp"],
     ]:
         Path(
-            os.path.join(out_folder, FLAGS.dataset, FLAGS.model_version, method)
+            os.path.join(out_folder, FLAGS.dataset, f"{FLAGS.model_version}-{FLAGS.train_skip}", method)
         ).mkdir(parents=True, exist_ok=True)
         step = 1
         if FLAGS.dataset == DATASETS['food101']:
@@ -61,7 +68,7 @@ def main(_argv):
         measure_model(
             FLAGS.model_version,
             FLAGS.dataset,
-            os.path.join(out_folder, FLAGS.dataset, FLAGS.model_version, method),
+            os.path.join(out_folder, FLAGS.dataset, f"{FLAGS.model_version}-{FLAGS.train_skip}", method),
             weights_dir,
             device,
             method=method,

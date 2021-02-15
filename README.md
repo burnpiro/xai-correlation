@@ -11,7 +11,20 @@ jupyter notebook
 
 If you want to work on the same datasets download them using references in [Datasets Section](#datasets).
 
-## Training models
+## Train and test all datasets for model
+
+```shell
+python train_and_test_all.py --model_version=resnet18
+```
+
+##### Parameters:
+- `model_version`: version of the model [`resnet18`, `resnet50`]
+
+### Saved Model output:
+`models/saved_models/{model_version}-{dataset}-{train_skip}.pth`
+
+
+## Training specific model and dataset
 
 ```shell
 python train_model.py --model_version=resnet18 --dataset=edible-plants
@@ -22,9 +35,9 @@ python train_model.py --model_version=resnet18 --dataset=edible-plants
 - `dataset`: version of the dataset [`edible-plants`, `food101`, `marvel`, `plant-data`, `stanford-dogs`]
 
 ### Saved Model output:
-`models/saved_models/{model_version}-{dataset}.pth`
+`models/saved_models/{model_version}-{dataset}-{train_skip}.pth`
 
-## Test models
+## Test specific model and dataset
 
 ```shell
 python test_model.py --model_version=resnet18 --dataset=edible-plants
@@ -33,21 +46,22 @@ python test_model.py --model_version=resnet18 --dataset=edible-plants
 ##### Parameters:
 - `model_version`: version of the model [`resnet18`, `resnet50`]
 - `dataset`: version of the dataset [`edible-plants`, `food101`, `marvel`, `plant-data`, `stanford-dogs`]
-- `weights`: (optional) path to `.pth` file with saved model, if none pasted then default one is used (`models/saved_models/{model_version}-{dataset}.pth`)
+- `weights`: (optional) path to `.pth` file with saved model, if none pasted then default one is used (`models/evals/{model_version}-{dataset}-{train_skip}.pth`)
 
 
 ## Measure metrics for models
 
-Calculate Infidelity and Sensitivity values for given model and dataset. Measures are calculated for every method available. All experiments are stored in: `experiments/{dataset}/{model_version}/{metohod}/...`
+Calculate Infidelity and Sensitivity values for given model and dataset. Measures are calculated for every method available. All experiments are stored in: `experiments/{dataset}/{model_version}-{train_skip}/{metohod}/...`
 
 ```shell
-python measure_model.py --model_version=resnet18 --dataset=edible-plants
+python measure_model.py --model_version=resnet18 --dataset=edible-plants --train_skip=100%
 ```
 
 ##### Parameters:
 - `model_version`: version of the model [`resnet18`, `resnet50`]
 - `dataset`: version of the dataset [`edible-plants`, `food101`, `marvel`, `plant-data`, `stanford-dogs`]
-- `weights`: (optional) path to `.pth` file with saved model, if none pasted then default one is used (`models/saved_models/{model_version}-{dataset}.pth`)
+- `train_skip`: (optional, default `100%`) version of the train dataset size [`100%`, `80%`, `60%`, `40%`, `20%`]
+- `weights`: (optional) path to `.pth` file with saved model, if none pasted then default one is used (`models/saved_models/{model_version}-{dataset}-{train_skip}.pth`)
 
 
 ## List of Notebooks

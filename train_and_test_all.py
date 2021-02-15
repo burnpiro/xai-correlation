@@ -48,8 +48,6 @@ def main(_argv):
             weights_dir = os.path.join(
                 model_folder, f"{FLAGS.model_version}-{dataset}-{label}.pth"
             )
-            if FLAGS.weights is not None:
-                weights_dir = FLAGS.weights
 
             test_model(
                 FLAGS.model_version, dataset, out_folder, weights_dir, device, label
