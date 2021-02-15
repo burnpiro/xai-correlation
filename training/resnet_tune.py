@@ -43,7 +43,7 @@ def train_resnet(dataset, model_type="resnet18", data_dir=None, skip=None):
             train_dataset, batch_size=8, shuffle=True, num_workers=4
         ),
         "val": torch.utils.data.DataLoader(
-            test_dataset, batch_size=1, shuffle=False, num_workers=4
+            test_dataset, batch_size=8, shuffle=False, num_workers=4
         ),
     }
 
