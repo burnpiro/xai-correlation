@@ -20,7 +20,7 @@ def run_eval(preds, labels, names):
     return conf_matrix, class_report
 
 
-def save_cm(cm, labels, filename, figsize=(40, 40)):
+def save_cm(cm, labels, filename, figsize=(40, 40), subtitle=""):
     cm_sum = np.sum(cm, axis=1, keepdims=True)
     cm_perc = cm / cm_sum.astype(float) * 100
     annot = np.empty_like(cm).astype(str)
@@ -40,7 +40,7 @@ def save_cm(cm, labels, filename, figsize=(40, 40)):
     cm.index.name = "Actual"
     cm.columns.name = "Predicted"
     fig, ax = plt.subplots(figsize=figsize)
-    fig.suptitle("Confusion Matrix", fontsize=42)
+    fig.suptitle("\n".join(["Confusion Matrix", subtitle]), fontsize=42)
     ax.xaxis.label.set_size(36)
     ax.yaxis.label.set_size(36)
     ax.tick_params(axis="both", which="major", labelsize=26)
@@ -55,7 +55,7 @@ def classification_report_latex(report, filename="report.txt"):
         tf.write(df.to_latex(float_format="%.2f"))
 
 
-def test_model(model_version, dataset, out_folder, weights_dir, device):
+def test_model(model_version, dataset, out_folder, weights_dir, device, version="100%"):
     data_dir = os.path.join("data")
 
     if model_version == "resnet18":
@@ -79,8 +79,7 @@ def test_model(model_version, dataset, out_folder, weights_dir, device):
 
     preds = []
     labels = []
-    print(f"Testing {model_version} on {dataset} dataset")
-    print("-" * 10)
+    print("-" * 30)
     pbar = tqdm(total=test_dataset.__len__(), desc="Model test completion")
     for input, label in data_loader:
         input = input.to(device)
@@ -94,17 +93,19 @@ def test_model(model_version, dataset, out_folder, weights_dir, device):
     pbar.close()
 
     conf_matrix, class_report = run_eval(preds, labels, test_dataset.classes)
+    subtitle = f"F1: {'{0:.2f}'.format(class_report['weighted avg']['f1-score'])}, Prec: {'{0:.2f}'.format(class_report['weighted avg']['precision'])}"
     save_cm(
         conf_matrix,
         test_dataset.classes,
-        os.path.join(out_folder, f"{model_version}-{dataset}.png"),
+        os.path.join(out_folder, f"{model_version}-{dataset}-{version}.png"),
+        subtitle=subtitle,
     )
 
     classification_report_latex(
         class_report,
-        filename=os.path.join(out_folder, f"{model_version}-{dataset}.txt"),
+        filename=os.path.join(out_folder, f"{model_version}-{dataset}-{version}.txt"),
     )
 
     print(
-        f'Artifacts stored at {os.path.join(out_folder, f"{model_version}-{dataset}")}.*'
+        f'Artifacts stored at {os.path.join(out_folder, f"{model_version}-{dataset}-{version}")}.*'
     )

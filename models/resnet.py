@@ -11,6 +11,14 @@ NUM_OF_CLASSES = {
     DATASETS["stanford-dogs"]: 120,
 }
 
+SPLIT_OPTIONS = {
+    "100%": None,
+    "80%": [5],
+    "60%": [4, 5],
+    "40%": [3, 4, 5],
+    "20%": [2, 3, 4, 5],
+}
+
 lime_mask = []
 input_size = 224  # size of the model's input
 scale_factor = 4  # input_size has to be dividable by scale factor

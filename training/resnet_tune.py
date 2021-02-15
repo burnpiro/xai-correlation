@@ -17,19 +17,17 @@ warnings.filterwarnings("ignore")
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 
-def train_resnet(dataset, model_type="resnet18", data_dir=None):
+def train_resnet(dataset, model_type="resnet18", data_dir=None, skip=None):
     data_transform = get_default_transformation()
     train_dataset = CustomDataset(
         dataset=dataset,
         transformer=data_transform,
         data_type="train",
-        root_dir=data_dir
+        root_dir=data_dir,
+        skip=skip,
     )
     test_dataset = CustomDataset(
-        dataset=dataset,
-        transformer=data_transform,
-        data_type="test",
-        root_dir=data_dir
+        dataset=dataset, transformer=data_transform, data_type="test", root_dir=data_dir
     )
 
     # def show_image(image, label, dataset):
@@ -71,11 +69,10 @@ def train_resnet(dataset, model_type="resnet18", data_dir=None):
         optimizer_ft,
         exp_lr_scheduler,
         device,
-        num_epochs=5,
+        num_epochs=15,
     )
 
     return model_ft
-
 
 
 # visualize_model(model_ft, dataset_loaders, device, class_names=train_dataset.classes)

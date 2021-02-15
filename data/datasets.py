@@ -270,7 +270,8 @@ class CustomDataset(Dataset):
         transformer=None,
         data_type="train",
         root_dir=None,
-        step=1
+        step=1,
+        skip=None,
     ):
         """
         Args:
@@ -280,6 +281,7 @@ class CustomDataset(Dataset):
                 on a sample.
             data_type (string): "train" or "test"
             step (int, optional): if different than 1 then data is iterated with given step
+            skip (List[int], optional): if set then skipping every nth element
         """
         if dataset == DATASETS["edible-plants"]:
             train_df, test_df = get_edible_plants_data(
@@ -301,6 +303,9 @@ class CustomDataset(Dataset):
         self.data = train_df if data_type == "train" else test_df
         if step != 1:
             self.data = self.data.iloc[::step, :]
+        if skip is not None:
+            for skip_val in skip:
+                self.data = self.data.drop(self.data.iloc[::skip_val].index, 0)
         self.transformer = transformer
         self._classes_df = self.data.drop_duplicates(subset=["class"])
 
