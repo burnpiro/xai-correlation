@@ -48,7 +48,7 @@ METHODS = {
     "gradcam": "gradcam",
     "deconv": "deconv",
     "gbp": "gbp",
-    "lime": "lime",
+    # "lime": "lime",
 }
 
 
@@ -58,7 +58,7 @@ def measure_model(
     out_folder,
     weights_dir,
     device,
-    method=METHODS["ig"],
+    method=METHODS["gradcam"],
     sample_images=50,
     step=1,
 ):

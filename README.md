@@ -59,8 +59,9 @@ python measure_model.py --model_version=resnet18 --dataset=edible-plants --train
 
 ##### Parameters:
 - `model_version`: version of the model [`resnet18`, `resnet50`]
-- `dataset`: version of the dataset [`edible-plants`, `food101`, `marvel`, `plant-data`, `stanford-dogs`]
+- `dataset`: (optional) version of the dataset [`edible-plants`, `food101`, `marvel`, `plant-data`, `stanford-dogs`] if `None` then all versions are tested (`--weights` parameter is ignored)
 - `train_skip`: (optional, default `None`) version of the train dataset size [`100%`, `80%`, `60%`, `40%`, `20%`], if `None` then all versions are tested (`--weights` parameter is ignored)
+  - `method`: method to test [`ig`, `sailency`, `gradcam`, `deconv`, `gbp`]
 - `weights`: (optional) path to `.pth` file with saved model, if none pasted then default one is used (`models/saved_models/{model_version}-{dataset}-{train_skip}.pth`)
 
 
