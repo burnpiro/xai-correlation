@@ -82,7 +82,7 @@ def measure_model(
         transformer=get_default_transformation(),
         data_type="test",
         root_dir=data_dir,
-        step=step
+        step=step,
     )
     data_loader = torch.utils.data.DataLoader(
         test_dataset, batch_size=1, shuffle=False, num_workers=4
@@ -120,7 +120,7 @@ def measure_model(
         attr_method = GuidedBackprop(model)
         nt_samples = 8
         n_perturb_samples = 10
-    if method == METHODS["lime"]:
+    if method == "lime":
         attr_method = Lime(model)
         nt_samples = 8
         n_perturb_samples = 10
@@ -145,7 +145,7 @@ def measure_model(
         prediction_score = prediction_score.cpu().detach().numpy()[0][0]
         pred_label_idx.squeeze_()
 
-        if method == METHODS["lime"]:
+        if method == "lime":
             attributions = attr_method.attribute(input, target=1, n_samples=50)
         else:
             attributions = nt.attribute(
@@ -159,7 +159,7 @@ def measure_model(
             model, perturb_fn, input, attributions, target=pred_label_idx
         )
 
-        if method == METHODS["lime"]:
+        if method == "lime":
             sens = sensitivity_max(
                 attr_method.attribute,
                 input,
