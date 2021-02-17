@@ -52,7 +52,7 @@ def save_cm(cm, labels, filename, figsize=(40, 40), subtitle=""):
 def classification_report_latex(report, filename="report.txt"):
     df = pd.DataFrame(report).transpose()
     with open(filename, "w") as tf:
-        tf.write(df.to_latex(float_format="%.2f"))
+        tf.write(df.to_latex(float_format="%.3f"))
 
 
 def test_model(model_version, dataset, out_folder, weights_dir, device, version="100%"):
@@ -93,7 +93,9 @@ def test_model(model_version, dataset, out_folder, weights_dir, device, version=
     pbar.close()
 
     conf_matrix, class_report = run_eval(preds, labels, test_dataset.classes)
-    subtitle = f"F1: {'{0:.2f}'.format(class_report['weighted avg']['f1-score'])}, Prec: {'{0:.2f}'.format(class_report['weighted avg']['precision'])}"
+    f1 = '{0:.4f}'.format(class_report['weighted avg']['f1-score'])
+    acc = '{0:.4f}'.format(class_report['weighted avg']['precision'])
+    subtitle = f"F1: {f1}, Prec: {acc}"
     save_cm(
         conf_matrix,
         test_dataset.classes,
@@ -105,6 +107,9 @@ def test_model(model_version, dataset, out_folder, weights_dir, device, version=
         class_report,
         filename=os.path.join(out_folder, f"{model_version}-{dataset}-{version}.txt"),
     )
+
+    with open(os.path.join(out_folder, f"{model_version}-{dataset}-{version}.csv"), "w") as tf:
+        tf.write(f"{f1},{acc}")
 
     print(
         f'Artifacts stored at {os.path.join(out_folder, f"{model_version}-{dataset}-{version}")}.*'

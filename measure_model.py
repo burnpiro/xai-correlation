@@ -12,27 +12,27 @@ warnings.filterwarnings("ignore")
 
 FLAGS = flags.FLAGS
 
-flags.DEFINE_enum(
+flags.DEFINE_multi_enum(
     "model_version",
-    "resnet18",
+    ["resnet18"],
     ["resnet18", "resnet50"],
     "Model version [resnet18, resnet50]",
 )
-flags.DEFINE_enum(
+flags.DEFINE_multi_enum(
     "dataset",
-    None,
+    [],
     list(DATASETS.keys()),
     f"(optional) Dataset name, one of available datasets: {list(DATASETS.keys())}",
 )
-flags.DEFINE_enum(
+flags.DEFINE_multi_enum(
     "train_skip",
-    None,
+    [],
     list(SPLIT_OPTIONS.keys()),
     f"(optional) version of the train dataset size: {list(SPLIT_OPTIONS.keys())}",
 )
-flags.DEFINE_enum(
+flags.DEFINE_multi_enum(
     "method",
-    None,
+    [],
     list(METHODS.keys()),
     f"(optional) select on of available methods: {list(METHODS.keys())}",
 )
@@ -49,56 +49,63 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 def main(_argv):
     datasets = DATASETS.keys()
-    if FLAGS.dataset is not None:
-        datasets = [FLAGS.dataset]
+    if len(FLAGS.dataset) > 0:
+        datasets = FLAGS.dataset
 
     items = SPLIT_OPTIONS
-    if FLAGS.train_skip is not None:
-        items = {FLAGS.train_skip: SPLIT_OPTIONS[FLAGS.train_skip]}
+    if len(FLAGS.train_skip) > 0:
+        items = {
+            train_skip: SPLIT_OPTIONS[train_skip] for train_skip in FLAGS.train_skip
+        }
 
     methods = METHODS.values()
-    if FLAGS.method is not None:
-        methods = [METHODS[FLAGS.method]]
+    if len(FLAGS.method) > 0:
+        methods = [METHODS[method] for method in FLAGS.method]
 
-    for dataset in datasets:
-        for label, skip in items.items():
-            weights_dir = os.path.join(
-                model_folder,
-                f"{FLAGS.model_version}-{dataset}-{label}.pth",
-            )
-            if FLAGS.weights is not None and FLAGS.train_skip is None and FLAGS.dataset is not None:
-                weights_dir = FLAGS.weights
-
-            for method in methods:
-                Path(
-                    os.path.join(
-                        out_folder,
-                        dataset,
-                        f"{FLAGS.model_version}-{label}",
-                        method,
-                    )
-                ).mkdir(parents=True, exist_ok=True)
-                step = 1
-                if dataset == DATASETS["food101"]:
-                    step = 5
-                if dataset == DATASETS["stanford-dogs"]:
-                    step = 2
-                if dataset == DATASETS["plant-data"]:
-                    step = 2
-                measure_model(
-                    FLAGS.model_version,
-                    dataset,
-                    os.path.join(
-                        out_folder,
-                        dataset,
-                        f"{FLAGS.model_version}-{label}",
-                        method,
-                    ),
-                    weights_dir,
-                    device,
-                    method=method,
-                    step=step,
+    for model_version in FLAGS.model_version:
+        for dataset in datasets:
+            for label, skip in items.items():
+                weights_dir = os.path.join(
+                    model_folder,
+                    f"{model_version}-{dataset}-{label}.pth",
                 )
+                if (
+                    FLAGS.weights is not None
+                    and len(FLAGS.train_skip) == 0
+                    and len(FLAGS.dataset) == 0
+                ):
+                    weights_dir = FLAGS.weights
+
+                for method in methods:
+                    Path(
+                        os.path.join(
+                            out_folder,
+                            dataset,
+                            f"{model_version}-{label}",
+                            method,
+                        )
+                    ).mkdir(parents=True, exist_ok=True)
+                    step = 1
+                    if dataset == DATASETS["food101"]:
+                        step = 5
+                    if dataset == DATASETS["stanford-dogs"]:
+                        step = 2
+                    if dataset == DATASETS["plant-data"]:
+                        step = 2
+                    measure_model(
+                        model_version,
+                        dataset,
+                        os.path.join(
+                            out_folder,
+                            dataset,
+                            f"{model_version}-{label}",
+                            method,
+                        ),
+                        weights_dir,
+                        device,
+                        method=method,
+                        step=step,
+                    )
 
 
 if __name__ == "__main__":

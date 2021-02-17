@@ -8,15 +8,15 @@ from models.resnet import SPLIT_OPTIONS
 
 FLAGS = flags.FLAGS
 
-flags.DEFINE_enum(
+flags.DEFINE_multi_enum(
     "model_version",
-    "resnet18",
+    ["resnet18"],
     ["resnet18", "resnet50"],
     "Model version [resnet18, resnet50]",
 )
-flags.DEFINE_enum(
+flags.DEFINE_multi_enum(
     "dataset",
-    "edible-plants",
+    ["edible-plants"],
     list(DATASETS.keys()),
     f"Dataset name, one of available datasets: {list(DATASETS.keys())}",
 )
@@ -32,19 +32,25 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 
 def main(_argv):
-    for label, skip in SPLIT_OPTIONS.items():
-        print(
-            f"Testing {FLAGS.model_version} model trained on {label} of data ({FLAGS.dataset})"
-        )
-        weights_dir = os.path.join(
-            model_folder, f"{FLAGS.model_version}-{FLAGS.dataset}-{label}.pth"
-        )
-        if FLAGS.weights is not None:
-            weights_dir = FLAGS.weights
+    for model_version in FLAGS.model_version:
+        for dataset in FLAGS.dataset:
+            for label, skip in SPLIT_OPTIONS.items():
+                print(
+                    f"Testing {model_version} model trained on {label} of data ({dataset})"
+                )
+                weights_dir = os.path.join(
+                    model_folder, f"{model_version}-{dataset}-{label}.pth"
+                )
+                if (
+                    FLAGS.weights is not None
+                    and len(FLAGS.model_version) == 0
+                    and len(FLAGS.dataset) == 0
+                ):
+                    weights_dir = FLAGS.weights
 
-        test_model(
-            FLAGS.model_version, FLAGS.dataset, out_folder, weights_dir, device, label
-        )
+                test_model(
+                    model_version, dataset, out_folder, weights_dir, device, label
+                )
 
 
 if __name__ == "__main__":
