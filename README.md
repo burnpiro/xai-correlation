@@ -20,34 +20,10 @@ python train_and_test_all.py --model_version=resnet18
 ##### Parameters:
 - `model_version`: version of the model [`resnet18`, `resnet50`]
 
-### Saved Model output:
+#### Saved Model output:
 `models/saved_models/{model_version}-{dataset}-{train_skip}.pth`
 
-
-## Training specific model and dataset
-
-```shell
-python train_model.py --model_version=resnet18 --dataset=edible-plants
-```
-
-##### Parameters:
-- `model_version`: version of the model [`resnet18`, `resnet50`]
-- `dataset`: version of the dataset [`edible-plants`, `food101`, `marvel`, `plant-data`, `stanford-dogs`]
-
-### Saved Model output:
-`models/saved_models/{model_version}-{dataset}-{train_skip}.pth`
-
-## Test specific model and dataset
-
-```shell
-python test_model.py --model_version=resnet18 --dataset=edible-plants
-```
-
-##### Parameters:
-- `model_version`: version of the model [`resnet18`, `resnet50`]
-- `dataset`: version of the dataset [`edible-plants`, `food101`, `marvel`, `plant-data`, `stanford-dogs`]
-- `weights`: (optional) path to `.pth` file with saved model, if none pasted then default one is used (`models/evals/{model_version}-{dataset}-{train_skip}.pth`)
-
+For more training and testing options check out **[Train and Eval Models Wiki](https://github.com/burnpiro/xai-correlation/wiki/Train-and-Eval-Models)**
 
 ## Measure metrics for models
 
@@ -57,11 +33,19 @@ Calculate Infidelity and Sensitivity values for given model and dataset. Measure
 python measure_model.py --model_version=resnet18 --dataset=edible-plants --train_skip=100%
 ```
 
+You can also paste multiple options:
+```shell
+python measure_model.py --model_version=resnet18 --dataset=edible-plants --dataset=marvel --train_skip=100% --train_skip=80% --method=ig --method=gradcam
+```
+
+This way you're going to measure results for `resnet18` base models, trained on `80%` and `100%` of `ediable-plants` and `marvel` datasets. Measurmenets will be done using `Integrated Gradiens` and `GradCAM` methods. At the end you'll run `1 x 2 x 2 x 2 = 8 processes`.
+
 ##### Parameters:
 - `model_version`: version of the model [`resnet18`, `resnet50`]
 - `dataset`: (optional) version of the dataset [`edible-plants`, `food101`, `marvel`, `plant-data`, `stanford-dogs`] if `None` then all versions are tested (`--weights` parameter is ignored)
 - `train_skip`: (optional, default `None`) version of the train dataset size [`100%`, `80%`, `60%`, `40%`, `20%`], if `None` then all versions are tested (`--weights` parameter is ignored)
   - `method`: method to test [`ig`, `sailency`, `gradcam`, `deconv`, `gbp`]
+- `method`: method to test [`ig`, `sailency`, `gradcam`, `deconv`, `gbp`]
 - `weights`: (optional) path to `.pth` file with saved model, if none pasted then default one is used (`models/saved_models/{model_version}-{dataset}-{train_skip}.pth`)
 
 
