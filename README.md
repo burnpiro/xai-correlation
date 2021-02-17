@@ -51,6 +51,8 @@ This way you're going to measure results for `resnet18` base models, trained on 
 
 ## List of Notebooks
 
+- `Multiple metrics.ipynb` - All metrics for specific model.
+- `Metrics on default datasets.ipynb` - First version of metrics achieved on full datasets
 - `Resnet18 IG NoiseTunnel.ipynb` - Integrated Gradients base explanation
 - `Resnet18 Deconvolution.ipynb` - Deconvolution base explanation
 - `Resnet18 GBP.ipynb` - Guided Backpropagation base explanation
