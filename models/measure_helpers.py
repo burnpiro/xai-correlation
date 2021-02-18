@@ -100,6 +100,7 @@ def measure_model(
     print(f"Measuring {model_version} on {dataset} dataset, with {method}")
     print("-" * 10)
     pbar = tqdm(total=test_dataset.__len__(), desc="Model test completion")
+    multipy_by_inputs = False
     if method == METHODS["ig"]:
         attr_method = IntegratedGradients(model)
         nt_samples = 6
@@ -125,10 +126,11 @@ def measure_model(
         nt_samples = 8
         n_perturb_samples = 10
         feature_mask = torch.tensor(lime_mask).to(device)
+        multipy_by_inputs = True
     nt = NoiseTunnel(attr_method)
     scores = []
 
-    @infidelity_perturb_func_decorator(multipy_by_inputs=False)
+    @infidelity_perturb_func_decorator(multipy_by_inputs=multipy_by_inputs)
     def perturb_fn(inputs):
         noise = torch.tensor(np.random.normal(0, 0.003, inputs.shape)).float()
         noise = noise.to(device)

@@ -79,6 +79,7 @@ def test_model(model_version, dataset, out_folder, weights_dir, device, version=
 
     preds = []
     labels = []
+    scores = []
     print("-" * 30)
     pbar = tqdm(total=test_dataset.__len__(), desc="Model test completion")
     for input, label in data_loader:
@@ -88,13 +89,23 @@ def test_model(model_version, dataset, out_folder, weights_dir, device, version=
         output = F.softmax(output, dim=1)
         prediction_score, pred_label_idx = torch.topk(output, 1)
         pred_label_idx.squeeze_()
-        labels.append(label.numpy()[0])
-        preds.append(pred_label_idx.item())
+        label_val = int(label.detach().numpy()[0])
+        pred_val = int(pred_label_idx.detach().item())
+        labels.append(label_val)
+        preds.append(pred_val)
+        scores.append(
+            [
+                label_val,
+                pred_val,
+                label_val == pred_val,
+                prediction_score.detach().cpu().numpy()[0][0],
+            ]
+        )
     pbar.close()
 
     conf_matrix, class_report = run_eval(preds, labels, test_dataset.classes)
-    f1 = '{0:.4f}'.format(class_report['weighted avg']['f1-score'])
-    acc = '{0:.4f}'.format(class_report['weighted avg']['precision'])
+    f1 = "{0:.4f}".format(class_report["weighted avg"]["f1-score"])
+    acc = "{0:.4f}".format(class_report["weighted avg"]["precision"])
     subtitle = f"F1: {f1}, Prec: {acc}"
     save_cm(
         conf_matrix,
@@ -108,8 +119,13 @@ def test_model(model_version, dataset, out_folder, weights_dir, device, version=
         filename=os.path.join(out_folder, f"{model_version}-{dataset}-{version}.txt"),
     )
 
-    with open(os.path.join(out_folder, f"{model_version}-{dataset}-{version}.csv"), "w") as tf:
+    with open(
+        os.path.join(out_folder, f"{model_version}-{dataset}-{version}.csv"), "w"
+    ) as tf:
         tf.write(f"{f1},{acc}")
+
+    scores_df = pd.DataFrame(np.array(scores), columns=['true', 'pred', 'currect', 'score'])
+    scores_df.to_csv(os.path.join(out_folder, f"{model_version}-{dataset}-{version}-scores.csv"))
 
     print(
         f'Artifacts stored at {os.path.join(out_folder, f"{model_version}-{dataset}-{version}")}.*'
