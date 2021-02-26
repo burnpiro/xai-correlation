@@ -4,7 +4,7 @@ import torch
 from absl import app, flags
 from pathlib import Path
 from data.datasets import DATASETS
-from models.resnet import SPLIT_OPTIONS
+from models.common import SPLIT_OPTIONS
 from models.measure_helpers import measure_model, METHODS
 import warnings
 

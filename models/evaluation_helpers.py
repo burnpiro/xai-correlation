@@ -8,7 +8,8 @@ from tqdm import tqdm
 import torch.nn.functional as F
 from sklearn.metrics import confusion_matrix, classification_report
 from data.datasets import CustomDataset, get_default_transformation
-from models.resnet import create_resnet18_model, create_resnet50_model, NUM_OF_CLASSES
+from models.common import NUM_OF_CLASSES
+from models.resnet import create_resnet18_model, create_resnet50_model
 
 
 def run_eval(preds, labels, names):

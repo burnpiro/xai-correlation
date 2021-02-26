@@ -4,7 +4,7 @@ import torch
 from absl import app, flags
 from training.resnet_tune import train_resnet
 from data.datasets import DATASETS
-from models.resnet import SPLIT_OPTIONS
+from models.common import SPLIT_OPTIONS
 
 FLAGS = flags.FLAGS
 

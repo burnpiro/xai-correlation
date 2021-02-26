@@ -17,9 +17,9 @@ from data.datasets import (
 from models.resnet import (
     create_resnet18_model,
     create_resnet50_model,
-    NUM_OF_CLASSES,
     lime_mask,
 )
+from models.common import NUM_OF_CLASSES
 from matplotlib.colors import LinearSegmentedColormap
 
 from captum.attr import (
