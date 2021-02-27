@@ -4,15 +4,15 @@ import torch
 from absl import app, flags
 from models.evaluation_helpers import test_model
 from data.datasets import DATASETS
-from models.common import SPLIT_OPTIONS
+from models.common import SPLIT_OPTIONS, AVAILABLE_MODELS
 
 FLAGS = flags.FLAGS
 
 flags.DEFINE_multi_enum(
     "model_version",
     ["resnet18"],
-    ["resnet18", "resnet50"],
-    "Model version [resnet18, resnet50]",
+    AVAILABLE_MODELS,
+    f"Model version {AVAILABLE_MODELS}",
 )
 flags.DEFINE_multi_enum(
     "dataset",

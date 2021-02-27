@@ -10,6 +10,7 @@ from sklearn.metrics import confusion_matrix, classification_report
 from data.datasets import CustomDataset, get_default_transformation
 from models.common import NUM_OF_CLASSES
 from models.resnet import create_resnet18_model, create_resnet50_model
+from models.efficientnet import create_efficientnetb0_model
 
 
 def run_eval(preds, labels, names):
@@ -61,8 +62,10 @@ def test_model(model_version, dataset, out_folder, weights_dir, device, version=
 
     if model_version == "resnet18":
         model = create_resnet18_model(num_of_classes=NUM_OF_CLASSES[dataset])
-    else:
+    elif model_version == "resnet50":
         model = create_resnet50_model(num_of_classes=NUM_OF_CLASSES[dataset])
+    else:
+        model = create_efficientnetb0_model(num_of_classes=NUM_OF_CLASSES[dataset])
 
     model.load_state_dict(torch.load(weights_dir))
     model.eval()

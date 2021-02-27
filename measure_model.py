@@ -4,7 +4,7 @@ import torch
 from absl import app, flags
 from pathlib import Path
 from data.datasets import DATASETS
-from models.common import SPLIT_OPTIONS
+from models.common import SPLIT_OPTIONS, AVAILABLE_MODELS
 from models.measure_helpers import measure_model, METHODS
 import warnings
 
@@ -15,8 +15,8 @@ FLAGS = flags.FLAGS
 flags.DEFINE_multi_enum(
     "model_version",
     ["resnet18"],
-    ["resnet18", "resnet50"],
-    "Model version [resnet18, resnet50]",
+    AVAILABLE_MODELS,
+    f"Model version {AVAILABLE_MODELS}",
 )
 flags.DEFINE_multi_enum(
     "dataset",

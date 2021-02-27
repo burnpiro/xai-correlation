@@ -17,9 +17,9 @@ from data.datasets import (
 from models.resnet import (
     create_resnet18_model,
     create_resnet50_model,
-    lime_mask,
 )
-from models.common import NUM_OF_CLASSES
+from models.efficientnet import create_efficientnetb0_model
+from models.common import NUM_OF_CLASSES, lime_mask
 from matplotlib.colors import LinearSegmentedColormap
 
 from captum.attr import (
@@ -67,8 +67,10 @@ def measure_model(
 
     if model_version == "resnet18":
         model = create_resnet18_model(num_of_classes=NUM_OF_CLASSES[dataset])
-    else:
+    elif model_version == "resnet50":
         model = create_resnet50_model(num_of_classes=NUM_OF_CLASSES[dataset])
+    else:
+        model = create_efficientnetb0_model(num_of_classes=NUM_OF_CLASSES[dataset])
 
     model.load_state_dict(torch.load(weights_dir))
 
@@ -110,7 +112,10 @@ def measure_model(
         nt_samples = 8
         n_perturb_samples = 10
     if method == METHODS["gradcam"]:
-        attr_method = GuidedGradCam(model, model.conv1)
+        if model_version == "efficientnet":
+            attr_method = GuidedGradCam(model, model._conv_stem)
+        else:
+            attr_method = GuidedGradCam(model, model.conv1)
         nt_samples = 8
         n_perturb_samples = 10
     if method == METHODS["deconv"]:

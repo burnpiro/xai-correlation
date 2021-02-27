@@ -8,3 +8,4 @@ absl-py
 scikit-learn
 seaborn
 tqdm
+efficientnet_pytorch
