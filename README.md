@@ -18,7 +18,7 @@ python train_and_test_all.py --model_version=resnet18
 ```
 
 ##### Parameters:
-- `model_version`: version of the model [`resnet18`, `resnet50`]
+- `model_version`: version of the model [`resnet18`, `resnet50`, `efficientnet`]
 
 #### Saved Model output:
 `models/saved_models/{model_version}-{dataset}-{train_skip}.pth`
@@ -35,13 +35,22 @@ python measure_model.py --model_version=resnet18 --dataset=edible-plants --train
 
 You can also paste multiple options:
 ```shell
-python measure_model.py --model_version=resnet18 --dataset=edible-plants --dataset=marvel --train_skip=100% --train_skip=80% --method=ig --method=gradcam
+python measure_model.py --model_version=resnet18 --dataset=edible-plants --dataset=marvel --train_skip=100% --train_skip=80% --method=gradcam
 ```
 
 This way you're going to measure results for `resnet18` base models, trained on `80%` and `100%` of `ediable-plants` and `marvel` datasets. Measurmenets will be done using `Integrated Gradiens` and `GradCAM` methods. At the end you'll run `1 x 2 x 2 x 2 = 8 processes`.
 
+### WARNING!!!
+
+If you want to calculate results for `Integrated Gradients`, make sure you have __enough memory on your GPU__. Test were run on __GTX 1080 Ti__ with 11GB memory available. That's not enough to calculate metrics for IG with the same number of perturbations as for other methods.
+
+If you don't have enough memory run experiments without `ig` flag:
+```shell
+python measure_model.py --model_version=efficientnet --method=sailency --method=gradcam --method=deconv --method=gbp
+```
+
 ##### Parameters:
-- `model_version`: version of the model [`resnet18`, `resnet50`]
+- `model_version`: version of the model [`resnet18`, `resnet50`, `efficientnet`]
 - `dataset`: (optional) version of the dataset [`edible-plants`, `food101`, `marvel`, `plant-data`, `stanford-dogs`] if `None` then all versions are tested (`--weights` parameter is ignored)
 - `train_skip`: (optional, default `None`) version of the train dataset size [`100%`, `80%`, `60%`, `40%`, `20%`], if `None` then all versions are tested (`--weights` parameter is ignored)
   - `method`: method to test [`ig`, `sailency`, `gradcam`, `deconv`, `gbp`]
@@ -51,12 +60,13 @@ This way you're going to measure results for `resnet18` base models, trained on 
 
 ## List of Notebooks
 
-- `Multiple metrics.ipynb` - All metrics for specific model.
-- `Metrics on default datasets.ipynb` - First version of metrics achieved on full datasets
-- `Resnet18 IG NoiseTunnel.ipynb` - Integrated Gradients base explanation
-- `Resnet18 Deconvolution.ipynb` - Deconvolution base explanation
-- `Resnet18 GBP.ipynb` - Guided Backpropagation base explanation
-- `Resnet18 Saliency.ipynb` - Saliency base explanation
+- `{Method} - Multiple metrics.ipynb` - All metrics for specific model.
+- `{Method} - Score vs metrics.ipynb` - Comparison of metric vs score on dataset.
+- `Metrics on default datasets.ipynb` - First version of metrics achieved on full datasets (not used in publication)
+- `method_samples/Resnet18 IG NoiseTunnel.ipynb` - Integrated Gradients base explanation
+- `method_samples/Resnet18 Deconvolution.ipynb` - Deconvolution base explanation
+- `method_samples/Resnet18 GBP.ipynb` - Guided Backpropagation base explanation
+- `method_samples/Resnet18 Saliency.ipynb` - Saliency base explanation
 - `dataset_eda/Stanford Dogs.ipynb` - EDA Stanford Dogs dataset
 - `dataset_eda/Food 101.ipynb` - EDA Food 101 dataset
 - `dataset_eda/Edible wild plants.ipynb` - EDA Edible wild plants dataset
