@@ -11,6 +11,7 @@ from data.datasets import CustomDataset, get_default_transformation
 from models.common import NUM_OF_CLASSES
 from models.resnet import create_resnet18_model, create_resnet50_model
 from models.efficientnet import create_efficientnetb0_model
+from models.densenet import create_densenet121_model
 
 
 def run_eval(preds, labels, names):
@@ -64,6 +65,8 @@ def test_model(model_version, dataset, out_folder, weights_dir, device, version=
         model = create_resnet18_model(num_of_classes=NUM_OF_CLASSES[dataset])
     elif model_version == "resnet50":
         model = create_resnet50_model(num_of_classes=NUM_OF_CLASSES[dataset])
+    elif model_version == "densenet":
+        model = create_densenet121_model(num_of_classes=NUM_OF_CLASSES[dataset])
     else:
         model = create_efficientnetb0_model(num_of_classes=NUM_OF_CLASSES[dataset])
 

@@ -4,6 +4,7 @@ import torch
 from absl import app, flags
 from training.resnet_tune import train_resnet
 from training.efficientnet_tune import train_efficientnet
+from training.densenet_tune import train_densenet
 from data.datasets import DATASETS
 from models.common import SPLIT_OPTIONS, AVAILABLE_MODELS
 
@@ -40,6 +41,11 @@ def main(_argv):
 
                 if model_version == AVAILABLE_MODELS[2]:
                     trained_model = train_efficientnet(
+                        dataset, model_version, data_dir=data_dir, skip=skip
+                    )
+
+                if model_version == AVAILABLE_MODELS[3]:
+                    trained_model = train_densenet(
                         dataset, model_version, data_dir=data_dir, skip=skip
                     )
 

@@ -19,6 +19,7 @@ from models.resnet import (
     create_resnet50_model,
 )
 from models.efficientnet import create_efficientnetb0_model
+from models.densenet import create_densenet121_model
 from models.common import NUM_OF_CLASSES, lime_mask
 from matplotlib.colors import LinearSegmentedColormap
 
@@ -69,6 +70,8 @@ def measure_model(
         model = create_resnet18_model(num_of_classes=NUM_OF_CLASSES[dataset])
     elif model_version == "resnet50":
         model = create_resnet50_model(num_of_classes=NUM_OF_CLASSES[dataset])
+    elif model_version == "densenet":
+        model = create_densenet121_model(num_of_classes=NUM_OF_CLASSES[dataset])
     else:
         model = create_efficientnetb0_model(num_of_classes=NUM_OF_CLASSES[dataset])
 
@@ -105,8 +108,8 @@ def measure_model(
     multipy_by_inputs = False
     if method == METHODS["ig"]:
         attr_method = IntegratedGradients(model)
-        nt_samples = 6
-        n_perturb_samples = 1
+        nt_samples = 8
+        n_perturb_samples = 3
     if method == METHODS["sailency"]:
         attr_method = Saliency(model)
         nt_samples = 8
@@ -114,6 +117,8 @@ def measure_model(
     if method == METHODS["gradcam"]:
         if model_version == "efficientnet":
             attr_method = GuidedGradCam(model, model._conv_stem)
+        elif model_version == "densenet":
+            attr_method = GuidedGradCam(model, model.conv0)
         else:
             attr_method = GuidedGradCam(model, model.conv1)
         nt_samples = 8
@@ -132,7 +137,10 @@ def measure_model(
         n_perturb_samples = 10
         feature_mask = torch.tensor(lime_mask).to(device)
         multipy_by_inputs = True
-    nt = NoiseTunnel(attr_method)
+    if method == METHODS['ig']:
+        nt = attr_method
+    else:
+        nt = NoiseTunnel(attr_method)
     scores = []
 
     @infidelity_perturb_func_decorator(multipy_by_inputs=multipy_by_inputs)
@@ -154,6 +162,12 @@ def measure_model(
 
         if method == "lime":
             attributions = attr_method.attribute(input, target=1, n_samples=50)
+        elif method == METHODS['ig']:
+            attributions = nt.attribute(
+                input,
+                target=pred_label_idx,
+                n_steps=25,
+            )
         else:
             attributions = nt.attribute(
                 input,
@@ -174,6 +188,14 @@ def measure_model(
                 n_perturb_samples=1,
                 n_samples=200,
                 feature_mask=feature_mask,
+            )
+        elif method == METHODS['ig']:
+            sens = sensitivity_max(
+                nt.attribute,
+                input,
+                target=pred_label_idx,
+                n_perturb_samples=n_perturb_samples,
+                n_steps=25,
             )
         else:
             sens = sensitivity_max(

@@ -1,7 +1,7 @@
 from data.datasets import DATASETS
 import numpy as np
 
-AVAILABLE_MODELS = ["resnet18", "resnet50", "efficientnet"]
+AVAILABLE_MODELS = ["resnet18", "resnet50", "efficientnet", "densenet"]
 
 NUM_OF_CLASSES = {
     DATASETS["edible-plants"]: 62,
