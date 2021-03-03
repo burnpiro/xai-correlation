@@ -118,7 +118,7 @@ def measure_model(
         if model_version == "efficientnet":
             attr_method = GuidedGradCam(model, model._conv_stem)
         elif model_version == "densenet":
-            attr_method = GuidedGradCam(model, model.conv0)
+            attr_method = GuidedGradCam(model, model.features.conv0)
         else:
             attr_method = GuidedGradCam(model, model.conv1)
         nt_samples = 8
