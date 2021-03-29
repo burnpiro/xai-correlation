@@ -4,6 +4,10 @@
 
 Install Pytorch using [Local Installation Guide](https://pytorch.org/get-started/locally/). Then run:
 
+### Dependencies (tested on Ubuntu 18.04):
+- Python __3.8__
+- torch __>=1.7.1__
+
 ```shell
 pip install  -r requirements.txt
 jupyter notebook
