@@ -272,6 +272,7 @@ class CustomDataset(Dataset):
         root_dir=None,
         step=1,
         skip=None,
+        rotate=False,
     ):
         """
         Args:
@@ -282,6 +283,7 @@ class CustomDataset(Dataset):
             data_type (string): "train" or "test"
             step (int, optional): if different than 1 then data is iterated with given step
             skip (List[int], optional): if set then skipping every nth element
+            rotate (boolean, optional): create sample rotation images
         """
         if dataset == DATASETS["edible-plants"]:
             train_df, test_df = get_edible_plants_data(
@@ -301,13 +303,24 @@ class CustomDataset(Dataset):
             train_df, test_df = get_dogs_data(os.path.join(root_dir, PATHS[dataset]))
 
         self.data = train_df if data_type == "train" else test_df
+        self._classes_df = self.data.drop_duplicates(subset=["class"])
         if step != 1:
             self.data = self.data.iloc[::step, :]
         if skip is not None:
             for skip_val in skip:
                 self.data = self.data.drop(self.data.iloc[::skip_val].index, 0)
         self.transformer = transformer
-        self._classes_df = self.data.drop_duplicates(subset=["class"])
+
+        self.rotate = rotate
+        if rotate:
+            new_df = pd.DataFrame()
+            for rotation in range(-30, 61, 15):
+                df1 = self.data.copy()
+                df1['rotation'] = str(rotation)
+                new_df = pd.concat([new_df, df1], ignore_index=True)
+
+            self.data = new_df
+
 
     def __len__(self):
         """
@@ -343,6 +356,9 @@ class CustomDataset(Dataset):
 
         row = self.data.iloc[idx]
         img = Image.open(row["image"]).convert("RGB")
+
+        if self.rotate:
+            img = img.rotate(int(row["rotation"]))
 
         if self.transformer:
             img = self.transformer(img)
