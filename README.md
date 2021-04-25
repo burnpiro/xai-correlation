@@ -97,11 +97,11 @@ Image Classification Models and Saliency Maps, K. Simonyan, et. al. 2014](https:
 
 Extract all datasets into `./data` directory.
 
-* `Stanford Dogs Dataset` - [Stanford Dogs Dataset](https://www.kaggle.com/jessicali9530/stanford-dogs-dataset)
+* `Stanford Dogs Dataset` - [Stanford Dogs Dataset](https://www.kaggle.com/jessicali9530/stanford-dogs-dataset) (change folder name into `Stanford_Dogs_Dataset`)
 ![dogs](./img/dogs.png)
 * `Food 101` - [Food 101 - Foodspotting](https://www.kaggle.com/kmader/food41)
 ![food101](./img/food101.png)
-* `Edible wild plants` - [Edible wild plants](https://www.kaggle.com/gverzea/edible-wild-plants)
+* `Edible wild plants` - [Edible wild plants](https://www.kaggle.com/gverzea/edible-wild-plants) (change folder name into `Edible_wild_plants`)
 ![wild](./img/wild-plants.png)
 * `Plants_Dataset` - [Plants_Dataset[99 classes]](https://www.kaggle.com/muhammadjawad1998/plants-dataset99-classes?select=Plant_Data)
 ![wild](./img/plants.png)
