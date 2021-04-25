@@ -53,7 +53,7 @@ METHODS = {
 }
 
 
-def measure_rotation_model(
+def measure_filter_model(
     model_version,
     dataset,
     out_folder,
@@ -88,7 +88,7 @@ def measure_rotation_model(
         data_type="test",
         root_dir=data_dir,
         step=step,
-        rotate=True
+        add_filters=True
     )
     data_loader = torch.utils.data.DataLoader(
         test_dataset, batch_size=1, shuffle=False, num_workers=4
@@ -208,7 +208,7 @@ def measure_rotation_model(
         inf_value = infid.cpu().detach().numpy()[0]
         sens_value = sens.cpu().detach().numpy()[0]
         if pbar.n in image_ids:
-            rotation = test_dataset.data.iloc[pbar.n]['rotation']
+            filter_name = test_dataset.data.iloc[pbar.n]['filter'].split(' ')[0]
             attr_data = attributions.squeeze().cpu().detach().numpy()
             fig, ax = viz.visualize_image_attr_multiple(
                 np.transpose(attr_data, (1, 2, 0)),
@@ -231,7 +231,7 @@ def measure_rotation_model(
             fig.savefig(
                 os.path.join(
                     out_folder,
-                    f"{str(label.numpy()[0])}-rotation-{str(rotation)}-{classes_map[str(label.numpy()[0])][0]}-{classes_map[str(pred_label_idx.item())][0]}.png",
+                    f"{str(label.numpy()[0])}-{str(filter_name)}-{classes_map[str(label.numpy()[0])][0]}-{classes_map[str(pred_label_idx.item())][0]}.png",
                 )
             )
             plt.close(fig)

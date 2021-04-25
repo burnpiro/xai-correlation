@@ -1,5 +1,6 @@
 from __future__ import print_function, division
 import os
+import gmic
 import torch
 import pandas as pd
 import numpy as np
@@ -19,11 +20,11 @@ DATASETS = {
 }
 
 PATHS = {
-    DATASETS["edible-plants"]: "Edible wild plants/datasets",
+    DATASETS["edible-plants"]: "Edible_wild_plants/datasets",
     DATASETS["food101"]: "food101",
     DATASETS["marvel"]: "marvel/marvel",
     DATASETS["plant-data"]: "Plant_Data/Plant_Data",
-    DATASETS["stanford-dogs"]: "Stanford Dogs Dataset/images/Images",
+    DATASETS["stanford-dogs"]: "Stanford_Dogs_Dataset/images/Images",
 }
 
 
@@ -49,7 +50,7 @@ def get_inverse_normalization_transformation():
     )
 
 
-def get_edible_plants_data(base_path="data/Edible wild plants/datasets"):
+def get_edible_plants_data(base_path="data/Edible_wild_plants/datasets"):
     train_base = os.path.join(base_path, "dataset")
 
     train_df = pd.DataFrame(columns=["image", "label", "class"])
@@ -228,7 +229,7 @@ def get_marvel_data(base_path="data/marvel/marvel"):
     return train_df, test_df
 
 
-def get_dogs_data(base_path="data/Stanford Dogs Dataset/images/Images"):
+def get_dogs_data(base_path="data/Stanford_Dogs_Dataset/images/Images"):
     train_df = pd.DataFrame(columns=["image", "label", "class"])
     test_df = pd.DataFrame(columns=["image", "label", "class"])
     classes = []
@@ -273,6 +274,7 @@ class CustomDataset(Dataset):
         step=1,
         skip=None,
         rotate=False,
+        add_filters=False,
     ):
         """
         Args:
@@ -316,11 +318,28 @@ class CustomDataset(Dataset):
             new_df = pd.DataFrame()
             for rotation in range(-30, 61, 15):
                 df1 = self.data.copy()
-                df1['rotation'] = str(rotation)
+                df1["rotation"] = str(rotation)
                 new_df = pd.concat([new_df, df1], ignore_index=True)
 
             self.data = new_df
 
+        self.add_filters = add_filters
+        if add_filters:
+            new_df = pd.DataFrame()
+
+            for filter in [
+                "fx_freaky_details 2,10,1,11,0,32,0",
+                "normalize_local 8,10",
+                "fx_boost_chroma 90,0,0",
+                "fx_mighty_details 25,1,25,1,11,0",
+                "sharpen 300",
+                "none",
+            ]:
+                df1 = self.data.copy()
+                df1["filter"] = str(filter)
+                new_df = pd.concat([new_df, df1], ignore_index=True)
+
+            self.data = new_df
 
     def __len__(self):
         """
@@ -356,6 +375,12 @@ class CustomDataset(Dataset):
 
         row = self.data.iloc[idx]
         img = Image.open(row["image"]).convert("RGB")
+
+        if self.add_filters:
+            if row["filter"] != "none":
+                images = []
+                gmic.run(f'"{row["image"]}" {row["filter"]}', images)
+                img = images[0].to_PIL()
 
         if self.rotate:
             img = img.rotate(int(row["rotation"]))

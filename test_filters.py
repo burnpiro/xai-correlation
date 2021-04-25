@@ -5,7 +5,7 @@ from absl import app, flags
 from pathlib import Path
 from data.datasets import DATASETS
 from models.common import SPLIT_OPTIONS, AVAILABLE_MODELS
-from models.measure_rotation_helpers import measure_rotation_model
+from models.measure_filter_helpers import measure_filter_model
 from models.measure_helpers import METHODS
 import warnings
 
@@ -44,7 +44,7 @@ flags.DEFINE_string(
 )
 
 model_folder = os.path.join("models", "saved_models")
-out_folder = os.path.join("experiments", "rotation")
+out_folder = os.path.join("experiments", "filters")
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 
@@ -93,7 +93,7 @@ def main(_argv):
                         step = 250
                     if dataset == DATASETS["plant-data"]:
                         step = 250
-                    measure_rotation_model(
+                    measure_filter_model(
                         model_version,
                         dataset,
                         os.path.join(
