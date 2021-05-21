@@ -57,18 +57,19 @@ python measure_model.py --model_version=efficientnet --method=sailency --method=
 - `model_version`: version of the model [`resnet18`, `resnet50`, `efficientnet`]
 - `dataset`: (optional) version of the dataset [`edible-plants`, `food101`, `marvel`, `plant-data`, `stanford-dogs`] if `None` then all versions are tested (`--weights` parameter is ignored)
 - `train_skip`: (optional, default `None`) version of the train dataset size [`100%`, `80%`, `60%`, `40%`, `20%`], if `None` then all versions are tested (`--weights` parameter is ignored)
-  - `method`: method to test [`ig`, `sailency`, `gradcam`, `deconv`, `gbp`]
-- `method`: method to test [`ig`, `sailency`, `gradcam`, `deconv`, `gbp`]
+  - `method`: method to test [`ig`, `sailency`, `gradcam`, `deconv`, `gradshap`, `gbp`]
+- `method`: method to test [`ig`, `sailency`, `gradcam`, `deconv`, `gradshap`, `gbp`]
 - `weights`: (optional) path to `.pth` file with saved model, if none pasted then default one is used (`models/saved_models/{model_version}-{dataset}-{train_skip}.pth`)
 
 
 ## List of Notebooks
 
-- `{Method} - Multiple metrics.ipynb` - All metrics for specific model.
-- `{Method} - Score vs metrics.ipynb` - Comparison of metric vs score on dataset.
+- `{Model} - Multiple metrics.ipynb` - All metrics for specific model.
+- `{Model} - Score vs metrics.ipynb` - Comparison of metric vs score on dataset.
 - `Metrics on default datasets.ipynb` - First version of metrics achieved on full datasets (not used in publication)
 - `method_samples/Resnet18 IG NoiseTunnel.ipynb` - Integrated Gradients base explanation
-- `method_samples/Resnet18 Deconvolution.ipynb` - Deconvolution base explanation
+- `method_samples/Resnet18 GradientShap.ipynb` - GradientShap base explanation
+- `method_samples/Resnet18 .ipynb` - Deconvolution base explanation
 - `method_samples/Resnet18 GBP.ipynb` - Guided Backpropagation base explanation
 - `method_samples/Resnet18 Saliency.ipynb` - Saliency base explanation
 - `dataset_eda/Stanford Dogs.ipynb` - EDA Stanford Dogs dataset
@@ -87,7 +88,8 @@ IG with Noise Tunnel
 * `NoiseTunnel`: [Sanity Checks for Saliency Maps, Julius Adebayo et al. 2018](https://arxiv.org/abs/1810.03292)
 * `Saliency`: [Deep Inside Convolutional Networks: Visualising
 Image Classification Models and Saliency Maps, K. Simonyan, et. al. 2014](https://arxiv.org/pdf/1312.6034.pdf)
-* `Deconvolution`: [Visualizing and Understanding Convolutional Networks, Matthew D Zeiler et al. 2014](https://arxiv.org/pdf/1311.2901.pdf)
+* `Deconvolution`: [Visualizing and Understanding Convolutional Networks, Scott Lundberg et al. 2017](https://arxiv.org/pdf/1705.07874.pdf)
+* `GradientShap`: [A Unified Approach to Interpreting Model Predictions, Matthew D Zeiler et al. 2014](https://arxiv.org/pdf/1311.2901.pdf)
 * `Guided Backpropagation`: [Striving for Simplicity: The All Convolutional Net, Jost Tobias Springenberg et al. 2015](https://arxiv.org/pdf/1412.6806.pdf)
 * `Infidelity and Sensitivity`: [On the (In)fidelity and Sensitivity for Explanations](https://arxiv.org/abs/1901.09392)
 * `ROAR`: [A Benchmark for Interpretability Methods in Deep Neural Networks](https://arxiv.org/abs/1806.10758)

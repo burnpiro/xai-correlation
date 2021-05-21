@@ -28,6 +28,7 @@ from captum.attr import (
     GuidedGradCam,
     Saliency,
     Deconvolution,
+    GradientShap,
     GuidedBackprop,
     Lime,
 )
@@ -48,9 +49,11 @@ METHODS = {
     "sailency": "sailency",
     "gradcam": "gradcam",
     "deconv": "deconv",
+    "gradshap": "gradshap",
     "gbp": "gbp",
     # "lime": "lime",
 }
+torch.manual_seed(42)
 
 
 def measure_filter_model(
@@ -128,6 +131,10 @@ def measure_filter_model(
         attr_method = Deconvolution(model)
         nt_samples = 8
         n_perturb_samples = 10
+    if method == METHODS["gradshap"]:
+        attr_method = GradientShap(model)
+        nt_samples = 8
+        n_perturb_samples = 10
     if method == METHODS["gbp"]:
         attr_method = GuidedBackprop(model)
         nt_samples = 8
@@ -161,6 +168,10 @@ def measure_filter_model(
         prediction_score = prediction_score.cpu().detach().numpy()[0][0]
         pred_label_idx.squeeze_()
 
+        if method == METHODS['gradshap']:
+            baseline = torch.randn(input.shape)
+            baseline = baseline.to(device)
+
         if method == "lime":
             attributions = attr_method.attribute(input, target=1, n_samples=50)
         elif method == METHODS['ig']:
@@ -168,6 +179,12 @@ def measure_filter_model(
                 input,
                 target=pred_label_idx,
                 n_steps=25,
+            )
+        elif method == METHODS['gradshap']:
+            attributions = nt.attribute(
+                input,
+                target=pred_label_idx,
+                baselines=baseline
             )
         else:
             attributions = nt.attribute(
@@ -197,6 +214,14 @@ def measure_filter_model(
                 target=pred_label_idx,
                 n_perturb_samples=n_perturb_samples,
                 n_steps=25,
+            )
+        elif method == METHODS['gradshap']:
+            sens = sensitivity_max(
+                nt.attribute,
+                input,
+                target=pred_label_idx,
+                n_perturb_samples=n_perturb_samples,
+                baselines=baseline
             )
         else:
             sens = sensitivity_max(
