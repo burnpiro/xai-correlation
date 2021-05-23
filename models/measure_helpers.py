@@ -133,7 +133,12 @@ def measure_model(
     if method == METHODS["gradshap"]:
         attr_method = GradientShap(model)
         nt_samples = 8
-        n_perturb_samples = 10
+        if model_version == "efficientnet":
+            n_perturb_samples = 3
+        elif model_version == "densenet":
+            n_perturb_samples = 2
+        else:
+            n_perturb_samples = 10
     if method == METHODS["gbp"]:
         attr_method = GuidedBackprop(model)
         nt_samples = 8

@@ -117,7 +117,7 @@ def measure_rotation_model(
     if method == METHODS["sailency"]:
         attr_method = Saliency(model)
         nt_samples = 8
-        n_perturb_samples = 10
+        n_perturb_samples = 2
     if method == METHODS["gradcam"]:
         if model_version == "efficientnet":
             attr_method = GuidedGradCam(model, model._conv_stem)
@@ -126,23 +126,23 @@ def measure_rotation_model(
         else:
             attr_method = GuidedGradCam(model, model.conv1)
         nt_samples = 8
-        n_perturb_samples = 10
+        n_perturb_samples = 2
     if method == METHODS["deconv"]:
         attr_method = Deconvolution(model)
         nt_samples = 8
-        n_perturb_samples = 10
+        n_perturb_samples = 2
     if method == METHODS["gradshap"]:
         attr_method = GradientShap(model)
         nt_samples = 8
-        n_perturb_samples = 10
+        n_perturb_samples = 2
     if method == METHODS["gbp"]:
         attr_method = GuidedBackprop(model)
         nt_samples = 8
-        n_perturb_samples = 10
+        n_perturb_samples = 2
     if method == "lime":
         attr_method = Lime(model)
         nt_samples = 8
-        n_perturb_samples = 10
+        n_perturb_samples = 2
         feature_mask = torch.tensor(lime_mask).to(device)
         multipy_by_inputs = True
     if method == METHODS['ig']:
