@@ -69,7 +69,7 @@ python measure_model.py --model_version=efficientnet --method=sailency --method=
 - `Metrics on default datasets.ipynb` - First version of metrics achieved on full datasets (not used in publication)
 - `method_samples/Resnet18 IG NoiseTunnel.ipynb` - Integrated Gradients base explanation
 - `method_samples/Resnet18 GradientShap.ipynb` - GradientShap base explanation
-- `method_samples/Resnet18 .ipynb` - Deconvolution base explanation
+- `method_samples/Resnet18 Deconvolution.ipynb` - Deconvolution base explanation
 - `method_samples/Resnet18 GBP.ipynb` - Guided Backpropagation base explanation
 - `method_samples/Resnet18 Saliency.ipynb` - Saliency base explanation
 - `dataset_eda/Stanford Dogs.ipynb` - EDA Stanford Dogs dataset
