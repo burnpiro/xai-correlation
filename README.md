@@ -62,6 +62,45 @@ python measure_model.py --model_version=efficientnet --method=saliency --method=
 - `weights`: (optional) path to `.pth` file with saved model, if none pasted then default one is used (`models/saved_models/{model_version}-{dataset}-{train_skip}.pth`)
 
 
+## Test augmentations
+
+### Rotations
+
+Generate attributions for rotated images. All experiments are stored in: `experiments/rotation/{dataset}/{model_version}-{train_skip}/{metohod}/...`
+
+```shell
+python test_rotation.py --model_version=resnet18 --dataset=edible-plants --train_skip=100%
+```
+
+### Filters
+
+Generate attributions for images with applied filters. All experiments are stored in: `experiments/filters/{dataset}/{model_version}-{train_skip}/{metohod}/...`
+
+```shell
+python test_filters.py --model_version=resnet18 --dataset=edible-plants --train_skip=100%
+```
+
+#### Multiple settings
+
+You can also paste multiple options:
+```shell
+python test_rotation.py --model_version=resnet18 --dataset=edible-plants --dataset=marvel --train_skip=100% --train_skip=80% --method=gradcam
+```
+
+This way you're going to measure results for `resnet18` base models, trained on `80%` and `100%` of `ediable-plants` and `marvel` datasets. Measurmenets will be done using `Integrated Gradiens` and `GradCAM` methods. At the end you'll run `1 x 2 x 2 x 2 = 8 processes`.
+
+##### Parameters:
+- `model_version`: version of the model [`resnet18`, `resnet50`, `efficientnet`]
+- `dataset`: (optional) version of the dataset [`edible-plants`, `food101`, `marvel`, `plant-data`, `stanford-dogs`] if `None` then all versions are tested (`--weights` parameter is ignored)
+- `train_skip`: (optional, default `None`) version of the train dataset size [`100%`, `80%`, `60%`, `40%`, `20%`], if `None` then all versions are tested (`--weights` parameter is ignored)
+  - `method`: method to test [`ig`, `saliency`, `gradcam`, `deconv`, `gradshap`, `gbp`]
+- `method`: method to test [`ig`, `saliency`, `gradcam`, `deconv`, `gradshap`, `gbp`]
+- `weights`: (optional) path to `.pth` file with saved model, if none pasted then default one is used (`models/saved_models/{model_version}-{dataset}-{train_skip}.pth`)
+- `weights`: (optional) path to `.pth` file with saved model, if none pasted then default one is used (`models/saved_models/{model_version}-{dataset}-{train_skip}.pth`)
+- `use_infidelity`: (optional) if flag is set then Infidelity measure is calculated
+- `use_sensitivity`: (optional) if flag is set then Sensitivity measure is calculated
+
+
 ## List of Notebooks
 
 - `{Model} - Multiple metrics.ipynb` - All metrics for specific model.

@@ -42,6 +42,16 @@ flags.DEFINE_string(
     None,
     "(optional) Dataset path to saved model",
 )
+flags.DEFINE_boolean(
+    "use_infidelity",
+    False,
+    "(optional) Should calculate infidelity measure",
+)
+flags.DEFINE_boolean(
+    "use_sensitivity",
+    False,
+    "(optional) Should calculate sensitivity measure",
+)
 
 model_folder = os.path.join("models", "saved_models")
 out_folder = os.path.join("experiments", "filters")
@@ -106,6 +116,8 @@ def main(_argv):
                         device,
                         method=method,
                         step=step,
+                        use_infidelity=FLAGS.use_infidelity,
+                        use_sensitivity=FLAGS.use_sensitivity,
                     )
 
 

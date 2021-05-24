@@ -65,6 +65,8 @@ def measure_rotation_model(
     method=METHODS["gradcam"],
     sample_images=50,
     step=1,
+    use_infidelity=False,
+    use_sensitivity=False,
 ):
     invTrans = get_inverse_normalization_transformation()
     data_dir = os.path.join("data")
@@ -91,14 +93,16 @@ def measure_rotation_model(
         data_type="test",
         root_dir=data_dir,
         step=step,
-        rotate=True
+        rotate=True,
     )
     data_loader = torch.utils.data.DataLoader(
         test_dataset, batch_size=1, shuffle=False, num_workers=4
     )
 
     try:
-        image_ids = random.sample(range(0, test_dataset.__len__()), test_dataset.__len__())
+        image_ids = random.sample(
+            range(0, test_dataset.__len__()), test_dataset.__len__()
+        )
     except ValueError:
         raise ValueError(
             f"Image sample number ({test_dataset.__len__()}) exceeded dataset size ({test_dataset.__len__()})."
@@ -145,7 +149,7 @@ def measure_rotation_model(
         n_perturb_samples = 2
         feature_mask = torch.tensor(lime_mask).to(device)
         multipy_by_inputs = True
-    if method == METHODS['ig']:
+    if method == METHODS["ig"]:
         nt = attr_method
     else:
         nt = NoiseTunnel(attr_method)
@@ -168,72 +172,74 @@ def measure_rotation_model(
         prediction_score = prediction_score.cpu().detach().numpy()[0][0]
         pred_label_idx.squeeze_()
 
-        if method == METHODS['gradshap']:
-            baseline = torch.randn(input.shape)
-            baseline = baseline.to(device)
+        if use_sensitivity or use_infidelity:
+            if method == METHODS["gradshap"]:
+                baseline = torch.randn(input.shape)
+                baseline = baseline.to(device)
 
-        if method == "lime":
-            attributions = attr_method.attribute(input, target=1, n_samples=50)
-        elif method == METHODS['ig']:
-            attributions = nt.attribute(
-                input,
-                target=pred_label_idx,
-                n_steps=25,
-            )
-        elif method == METHODS['gradshap']:
-            attributions = nt.attribute(
-                input,
-                target=pred_label_idx,
-                baselines=baseline
-            )
-        else:
-            attributions = nt.attribute(
-                input,
-                nt_type="smoothgrad",
-                nt_samples=nt_samples,
-                target=pred_label_idx,
-            )
+        if use_infidelity:
+            if method == "lime":
+                attributions = attr_method.attribute(input, target=1, n_samples=50)
+            elif method == METHODS["ig"]:
+                attributions = nt.attribute(
+                    input,
+                    target=pred_label_idx,
+                    n_steps=25,
+                )
+            elif method == METHODS["gradshap"]:
+                attributions = nt.attribute(
+                    input, target=pred_label_idx, baselines=baseline
+                )
+            else:
+                attributions = nt.attribute(
+                    input,
+                    nt_type="smoothgrad",
+                    nt_samples=nt_samples,
+                    target=pred_label_idx,
+                )
 
-        infid = infidelity(
-            model, perturb_fn, input, attributions, target=pred_label_idx
-        )
+            infid = infidelity(
+                model, perturb_fn, input, attributions, target=pred_label_idx
+            )
+            inf_value = infid.cpu().detach().numpy()[0]
 
-        if method == "lime":
-            sens = sensitivity_max(
-                attr_method.attribute,
-                input,
-                target=pred_label_idx,
-                n_perturb_samples=1,
-                n_samples=200,
-                feature_mask=feature_mask,
-            )
-        elif method == METHODS['ig']:
-            sens = sensitivity_max(
-                nt.attribute,
-                input,
-                target=pred_label_idx,
-                n_perturb_samples=n_perturb_samples,
-                n_steps=25,
-            )
-        elif method == METHODS['gradshap']:
-            sens = sensitivity_max(
-                nt.attribute,
-                input,
-                target=pred_label_idx,
-                n_perturb_samples=n_perturb_samples,
-                baselines=baseline
-            )
-        else:
-            sens = sensitivity_max(
-                nt.attribute,
-                input,
-                target=pred_label_idx,
-                n_perturb_samples=n_perturb_samples,
-            )
-        inf_value = infid.cpu().detach().numpy()[0]
-        sens_value = sens.cpu().detach().numpy()[0]
+        if use_sensitivity:
+            if method == "lime":
+                sens = sensitivity_max(
+                    attr_method.attribute,
+                    input,
+                    target=pred_label_idx,
+                    n_perturb_samples=1,
+                    n_samples=200,
+                    feature_mask=feature_mask,
+                )
+            elif method == METHODS["ig"]:
+                sens = sensitivity_max(
+                    nt.attribute,
+                    input,
+                    target=pred_label_idx,
+                    n_perturb_samples=n_perturb_samples,
+                    n_steps=25,
+                )
+            elif method == METHODS["gradshap"]:
+                sens = sensitivity_max(
+                    nt.attribute,
+                    input,
+                    target=pred_label_idx,
+                    n_perturb_samples=n_perturb_samples,
+                    baselines=baseline,
+                )
+            else:
+                sens = sensitivity_max(
+                    nt.attribute,
+                    input,
+                    target=pred_label_idx,
+                    n_perturb_samples=n_perturb_samples,
+                )
+            sens_value = sens.cpu().detach().numpy()[0]
+
         if pbar.n in image_ids:
-            rotation = test_dataset.data.iloc[pbar.n]['rotation']
+            rotation = test_dataset.data.iloc[pbar.n]["rotation"]
             attr_data = attributions.squeeze().cpu().detach().numpy()
             fig, ax = viz.visualize_image_attr_multiple(
                 np.transpose(attr_data, (1, 2, 0)),
@@ -246,9 +252,10 @@ def measure_rotation_model(
                 use_pyplot=False,
                 fig_size=(8, 6),
             )
-            ax[0].set_xlabel(
-                f"Infidelity: {'{0:.6f}'.format(inf_value)}\n Sensitivity: {'{0:.6f}'.format(sens_value)}"
-            )
+            if use_sensitivity or use_infidelity:
+                ax[0].set_xlabel(
+                    f"Infidelity: {'{0:.6f}'.format(inf_value if use_infidelity else 0)}\n Sensitivity: {'{0:.6f}'.format(sens_value if use_sensitivity else 0)}"
+                )
             fig.suptitle(
                 f"True: {classes_map[str(label.numpy()[0])][0]}, Pred: {classes_map[str(pred_label_idx.item())][0]}\nScore: {'{0:.4f}'.format(prediction_score)}",
                 fontsize=16,
