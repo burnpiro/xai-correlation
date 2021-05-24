@@ -316,10 +316,11 @@ class CustomDataset(Dataset):
         self.rotate = rotate
         if rotate:
             new_df = pd.DataFrame()
-            for rotation in range(-30, 61, 15):
+            for rotation in [0, -30, -15, 15, 30]:
                 df1 = self.data.copy()
                 df1["rotation"] = str(rotation)
                 new_df = pd.concat([new_df, df1], ignore_index=True)
+                new_df = new_df.sort_values(by=['image'], ignore_index=True)
 
             self.data = new_df
 
@@ -328,16 +329,17 @@ class CustomDataset(Dataset):
             new_df = pd.DataFrame()
 
             for filter in [
+                "none",
                 "fx_freaky_details 2,10,1,11,0,32,0",
                 "normalize_local 8,10",
                 "fx_boost_chroma 90,0,0",
                 "fx_mighty_details 25,1,25,1,11,0",
                 "sharpen 300",
-                "none",
             ]:
                 df1 = self.data.copy()
                 df1["filter"] = str(filter)
                 new_df = pd.concat([new_df, df1], ignore_index=True)
+                new_df = new_df.sort_values(by=['image'], ignore_index=True)
 
             self.data = new_df
 

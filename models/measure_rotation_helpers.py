@@ -22,6 +22,8 @@ from models.efficientnet import create_efficientnetb0_model
 from models.densenet import create_densenet121_model
 from models.common import NUM_OF_CLASSES, lime_mask
 from matplotlib.colors import LinearSegmentedColormap
+from skimage.metrics import structural_similarity as ssim
+from scipy import ndimage
 
 from captum.attr import (
     IntegratedGradients,
@@ -161,6 +163,10 @@ def measure_rotation_model(
         noise = noise.to(device)
         return inputs - noise
 
+    rotation_count = 0
+    ROTATIONS = [0, -30, -15, 15, 30]
+    rotation_attrs = {rot: [] for rot in ROTATIONS}
+    predicted_main_class = 0
     for input, label in data_loader:
         pbar.update(1)
         inv_input = invTrans(input)
@@ -171,35 +177,36 @@ def measure_rotation_model(
         prediction_score, pred_label_idx = torch.topk(output, 1)
         prediction_score = prediction_score.cpu().detach().numpy()[0][0]
         pred_label_idx.squeeze_()
+        if ROTATIONS[rotation_count] == 0:
+            predicted_main_class = pred_label_idx.item()
 
-        if use_sensitivity or use_infidelity:
-            if method == METHODS["gradshap"]:
-                baseline = torch.randn(input.shape)
-                baseline = baseline.to(device)
+        if method == METHODS["gradshap"]:
+            baseline = torch.randn(input.shape)
+            baseline = baseline.to(device)
 
         if method == "lime":
             attributions = attr_method.attribute(input, target=1, n_samples=50)
         elif method == METHODS["ig"]:
             attributions = nt.attribute(
                 input,
-                target=pred_label_idx,
+                target=predicted_main_class,
                 n_steps=25,
             )
         elif method == METHODS["gradshap"]:
             attributions = nt.attribute(
-                input, target=pred_label_idx, baselines=baseline
+                input, target=predicted_main_class, baselines=baseline
             )
         else:
             attributions = nt.attribute(
                 input,
                 nt_type="smoothgrad",
                 nt_samples=nt_samples,
-                target=pred_label_idx,
+                target=predicted_main_class,
             )
 
         if use_infidelity:
             infid = infidelity(
-                model, perturb_fn, input, attributions, target=pred_label_idx
+                model, perturb_fn, input, attributions, target=predicted_main_class
             )
             inf_value = infid.cpu().detach().numpy()[0]
         else:
@@ -210,7 +217,7 @@ def measure_rotation_model(
                 sens = sensitivity_max(
                     attr_method.attribute,
                     input,
-                    target=pred_label_idx,
+                    target=predicted_main_class,
                     n_perturb_samples=1,
                     n_samples=200,
                     feature_mask=feature_mask,
@@ -219,7 +226,7 @@ def measure_rotation_model(
                 sens = sensitivity_max(
                     nt.attribute,
                     input,
-                    target=pred_label_idx,
+                    target=predicted_main_class,
                     n_perturb_samples=n_perturb_samples,
                     n_steps=25,
                 )
@@ -227,7 +234,7 @@ def measure_rotation_model(
                 sens = sensitivity_max(
                     nt.attribute,
                     input,
-                    target=pred_label_idx,
+                    target=predicted_main_class,
                     n_perturb_samples=n_perturb_samples,
                     baselines=baseline,
                 )
@@ -235,7 +242,7 @@ def measure_rotation_model(
                 sens = sensitivity_max(
                     nt.attribute,
                     input,
-                    target=pred_label_idx,
+                    target=predicted_main_class,
                     n_perturb_samples=n_perturb_samples,
                 )
             sens_value = sens.cpu().detach().numpy()[0]
@@ -267,21 +274,57 @@ def measure_rotation_model(
             fig.savefig(
                 os.path.join(
                     out_folder,
-                    f"{str(label.numpy()[0])}-rotation-{str(rotation)}-{classes_map[str(label.numpy()[0])][0]}-{classes_map[str(pred_label_idx.item())][0]}.png",
+                    f"{str(pbar.n)}-{str(label.numpy()[0])}-rotation-{str(rotation)}-{classes_map[str(label.numpy()[0])][0]}-{classes_map[str(pred_label_idx.item())][0]}.png",
                 )
             )
             plt.close(fig)
             # if pbar.n > 25:
             #     break
 
-        scores.append([inf_value, sens_value])
+            score_for_true_label = output.cpu().detach().numpy()[0][predicted_main_class]
+
+            rotation_attrs[ROTATIONS[rotation_count]] = [
+                np.moveaxis(attr_data, 0, -1),
+                "{0:.8f}".format(score_for_true_label),
+            ]
+
+            rotation_count += 1
+            if rotation_count >= len(ROTATIONS):
+                ssims = []
+                for rot in ROTATIONS:
+                    rotated_attr = ndimage.rotate(
+                        rotation_attrs[0][0], rot, reshape=False
+                    )
+                    ssims.append(
+                        "{0:.8f}".format(
+                            ssim(
+                                rotated_attr,
+                                rotation_attrs[rot][0],
+                                data_range=rotation_attrs[rot][0].max()
+                                - rotation_attrs[rot][0].min(),
+                                multichannel=True,
+                            )
+                        )
+                    )
+                    ssims.append(rotation_attrs[rot][1])
+
+                scores.append(ssims)
+                rotation_count = 0
+                predicted_main_class = 0
+
     pbar.close()
 
+    indexes = []
+
+    for rot in ROTATIONS:
+        indexes.append(str(rot) + "-ssim")
+        indexes.append(str(rot) + "-score")
     np.savetxt(
-        os.path.join(out_folder, f"{model_version}-{dataset}-{method}.csv"),
+        os.path.join(out_folder, f"{model_version}-{dataset}-{method}-ssim.csv"),
         np.array(scores),
-        delimiter=",",
-        header="infidelity,sensitivity",
+        delimiter=";",
+        fmt="%s",
+        header=";".join([str(rot) for rot in indexes]),
     )
 
     print(f"Artifacts stored at {out_folder}")
