@@ -87,7 +87,7 @@ You can also paste multiple options:
 python test_rotation.py --model_version=resnet18 --dataset=edible-plants --dataset=marvel --train_skip=100% --train_skip=80% --method=gradcam
 ```
 
-This way you're going to measure results for `resnet18` base models, trained on `80%` and `100%` of `ediable-plants` and `marvel` datasets. Measurmenets will be done using `Integrated Gradiens` and `GradCAM` methods. At the end you'll run `1 x 2 x 2 x 2 = 8 processes`.
+This way you're going to measure results for `resnet18` base models, trained on `80%` and `100%` of `ediable-plants` and `marvel` datasets. Tests will be done using `Integrated Gradiens` and `GradCAM` methods. At the end you'll run `1 x 2 x 2 x 2 = 8 processes`.
 
 ##### Parameters:
 - `model_version`: version of the model [`resnet18`, `resnet50`, `efficientnet`]
