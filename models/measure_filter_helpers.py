@@ -303,8 +303,7 @@ def measure_filter_model(
                             ssim(
                                 filter_attrs["none"][0],
                                 filter_attrs[rot][0],
-                                data_range=filter_attrs[rot][0].max()
-                                - filter_attrs[rot][0].min(),
+                                win_size=5,
                                 multichannel=True,
                             )
                         )

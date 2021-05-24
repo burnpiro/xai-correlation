@@ -300,8 +300,7 @@ def measure_rotation_model(
                             ssim(
                                 rotated_attr,
                                 rotation_attrs[rot][0],
-                                data_range=rotation_attrs[rot][0].max()
-                                - rotation_attrs[rot][0].min(),
+                                win_size=5,
                                 multichannel=True,
                             )
                         )
