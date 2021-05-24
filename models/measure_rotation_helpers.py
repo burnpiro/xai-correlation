@@ -274,7 +274,7 @@ def measure_rotation_model(
             fig.savefig(
                 os.path.join(
                     out_folder,
-                    f"{str(pbar.n)}-{str(label.numpy()[0])}-rotation-{str(rotation)}-{classes_map[str(label.numpy()[0])][0]}-{classes_map[str(pred_label_idx.item())][0]}.png",
+                    f"{str(pbar.n)}-{str(label.numpy()[0])}-rotation-{str(ROTATIONS[rotation_count])}-{classes_map[str(label.numpy()[0])][0]}-{classes_map[str(pred_label_idx.item())][0]}.png",
                 )
             )
             plt.close(fig)
