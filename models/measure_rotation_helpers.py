@@ -46,7 +46,7 @@ default_cmap = LinearSegmentedColormap.from_list(
 
 METHODS = {
     "ig": "ig",
-    "sailency": "sailency",
+    "saliency": "saliency",
     "gradcam": "gradcam",
     "deconv": "deconv",
     "gradshap": "gradshap",
@@ -114,7 +114,7 @@ def measure_rotation_model(
         attr_method = IntegratedGradients(model)
         nt_samples = 1
         n_perturb_samples = 1
-    if method == METHODS["sailency"]:
+    if method == METHODS["saliency"]:
         attr_method = Saliency(model)
         nt_samples = 8
         n_perturb_samples = 2

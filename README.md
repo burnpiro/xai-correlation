@@ -50,15 +50,15 @@ If you want to calculate results for `Integrated Gradients`, make sure you have 
 
 If you don't have enough memory run experiments without `ig` flag:
 ```shell
-python measure_model.py --model_version=efficientnet --method=sailency --method=gradcam --method=deconv --method=gbp
+python measure_model.py --model_version=efficientnet --method=saliency --method=gradcam --method=deconv --method=gbp
 ```
 
 ##### Parameters:
 - `model_version`: version of the model [`resnet18`, `resnet50`, `efficientnet`]
 - `dataset`: (optional) version of the dataset [`edible-plants`, `food101`, `marvel`, `plant-data`, `stanford-dogs`] if `None` then all versions are tested (`--weights` parameter is ignored)
 - `train_skip`: (optional, default `None`) version of the train dataset size [`100%`, `80%`, `60%`, `40%`, `20%`], if `None` then all versions are tested (`--weights` parameter is ignored)
-  - `method`: method to test [`ig`, `sailency`, `gradcam`, `deconv`, `gradshap`, `gbp`]
-- `method`: method to test [`ig`, `sailency`, `gradcam`, `deconv`, `gradshap`, `gbp`]
+  - `method`: method to test [`ig`, `saliency`, `gradcam`, `deconv`, `gradshap`, `gbp`]
+- `method`: method to test [`ig`, `saliency`, `gradcam`, `deconv`, `gradshap`, `gbp`]
 - `weights`: (optional) path to `.pth` file with saved model, if none pasted then default one is used (`models/saved_models/{model_version}-{dataset}-{train_skip}.pth`)
 
 
