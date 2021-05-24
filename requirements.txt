@@ -6,7 +6,7 @@ pandas
 scikit-image
 absl-py
 scikit-learn
+scikit-image
 seaborn
 tqdm
 efficientnet_pytorch
-gmic

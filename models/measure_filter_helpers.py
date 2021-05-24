@@ -177,31 +177,33 @@ def measure_filter_model(
                 baseline = torch.randn(input.shape)
                 baseline = baseline.to(device)
 
-        if use_infidelity:
-            if method == "lime":
-                attributions = attr_method.attribute(input, target=1, n_samples=50)
-            elif method == METHODS["ig"]:
-                attributions = nt.attribute(
-                    input,
-                    target=pred_label_idx,
-                    n_steps=25,
-                )
-            elif method == METHODS["gradshap"]:
-                attributions = nt.attribute(
-                    input, target=pred_label_idx, baselines=baseline
-                )
-            else:
-                attributions = nt.attribute(
-                    input,
-                    nt_type="smoothgrad",
-                    nt_samples=nt_samples,
-                    target=pred_label_idx,
-                )
+        if method == "lime":
+            attributions = attr_method.attribute(input, target=1, n_samples=50)
+        elif method == METHODS["ig"]:
+            attributions = nt.attribute(
+                input,
+                target=pred_label_idx,
+                n_steps=25,
+            )
+        elif method == METHODS["gradshap"]:
+            attributions = nt.attribute(
+                input, target=pred_label_idx, baselines=baseline
+            )
+        else:
+            attributions = nt.attribute(
+                input,
+                nt_type="smoothgrad",
+                nt_samples=nt_samples,
+                target=pred_label_idx,
+            )
 
+        if use_infidelity:
             infid = infidelity(
                 model, perturb_fn, input, attributions, target=pred_label_idx
             )
             inf_value = infid.cpu().detach().numpy()[0]
+        else:
+            inf_value = 0
 
         if use_sensitivity:
             if method == "lime":
@@ -237,6 +239,8 @@ def measure_filter_model(
                     n_perturb_samples=n_perturb_samples,
                 )
             sens_value = sens.cpu().detach().numpy()[0]
+        else:
+            sens_value = 0
 
         if pbar.n in image_ids:
             filter_name = test_dataset.data.iloc[pbar.n]["filter"].split(" ")[0]
@@ -254,7 +258,7 @@ def measure_filter_model(
             )
             if use_sensitivity or use_infidelity:
                 ax[0].set_xlabel(
-                    f"Infidelity: {'{0:.6f}'.format(inf_value if use_infidelity else 0)}\n Sensitivity: {'{0:.6f}'.format(sens_value if use_sensitivity else 0)}"
+                    f"Infidelity: {'{0:.6f}'.format(inf_value)}\n Sensitivity: {'{0:.6f}'.format(sens_value)}"
                 )
             fig.suptitle(
                 f"True: {classes_map[str(label.numpy()[0])][0]}, Pred: {classes_map[str(pred_label_idx.item())][0]}\nScore: {'{0:.4f}'.format(prediction_score)}",
