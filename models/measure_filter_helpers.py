@@ -13,6 +13,7 @@ from data.datasets import (
     CustomDataset,
     get_default_transformation,
     get_inverse_normalization_transformation,
+    MAX_ATT_VALUES,
 )
 from models.resnet import (
     create_resnet18_model,
@@ -296,6 +297,7 @@ def measure_filter_model(
                 "{0:.8f}".format(score_for_true_label),
             ]
 
+            data_range_for_current_set = MAX_ATT_VALUES[model_version][method][dataset]
             filter_count += 1
             if filter_count >= len(OUR_FILTERS):
                 ssims = []
@@ -305,7 +307,8 @@ def measure_filter_model(
                             ssim(
                                 filter_attrs["none"][0],
                                 filter_attrs[rot][0],
-                                win_size=5,
+                                win_size=11,
+                                data_range=data_range_for_current_set,
                                 multichannel=True,
                             )
                         )
@@ -315,6 +318,7 @@ def measure_filter_model(
                 scores.append(ssims)
                 filter_count = 0
                 predicted_main_class = 0
+
     pbar.close()
 
     indexes = []
@@ -323,7 +327,7 @@ def measure_filter_model(
         indexes.append(str(filter_name) + "-ssim")
         indexes.append(str(filter_name) + "-score")
     np.savetxt(
-        os.path.join(out_folder, f"{model_version}-{dataset}-{method}-ssim.csv"),
+        os.path.join(out_folder, f"{model_version}-{dataset}-{method}-ssim-with-range.csv"),
         np.array(scores),
         delimiter=";",
         fmt="%s",

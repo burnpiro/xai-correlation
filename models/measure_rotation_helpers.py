@@ -13,6 +13,7 @@ from data.datasets import (
     CustomDataset,
     get_default_transformation,
     get_inverse_normalization_transformation,
+    MAX_ATT_VALUES,
 )
 from models.resnet import (
     create_resnet18_model,
@@ -291,6 +292,7 @@ def measure_rotation_model(
                 "{0:.8f}".format(score_for_true_label),
             ]
 
+            data_range_for_current_set = MAX_ATT_VALUES[model_version][method][dataset]
             rotation_count += 1
             if rotation_count >= len(ROTATIONS):
                 ssims = []
@@ -303,7 +305,8 @@ def measure_rotation_model(
                             ssim(
                                 rotated_attr,
                                 rotation_attrs[rot][0],
-                                win_size=5,
+                                win_size=11,
+                                data_range=data_range_for_current_set,
                                 multichannel=True,
                             )
                         )
@@ -322,7 +325,7 @@ def measure_rotation_model(
         indexes.append(str(rot) + "-ssim")
         indexes.append(str(rot) + "-score")
     np.savetxt(
-        os.path.join(out_folder, f"{model_version}-{dataset}-{method}-ssim.csv"),
+        os.path.join(out_folder, f"{model_version}-{dataset}-{method}-ssim-with-range.csv"),
         np.array(scores),
         delimiter=";",
         fmt="%s",
