@@ -69,6 +69,7 @@ def measure_rotation_model(
     step=1,
     use_infidelity=False,
     use_sensitivity=False,
+    render=False,
 ):
     invTrans = get_inverse_normalization_transformation()
     data_dir = os.path.join("data")
@@ -252,32 +253,34 @@ def measure_rotation_model(
         if pbar.n in image_ids:
             rotation = test_dataset.data.iloc[pbar.n]["rotation"]
             attr_data = attributions.squeeze().cpu().detach().numpy()
-            fig, ax = viz.visualize_image_attr_multiple(
-                np.transpose(attr_data, (1, 2, 0)),
-                np.transpose(inv_input.squeeze().cpu().detach().numpy(), (1, 2, 0)),
-                ["original_image", "heat_map"],
-                ["all", "positive"],
-                titles=["original_image", "heat_map"],
-                cmap=default_cmap,
-                show_colorbar=True,
-                use_pyplot=False,
-                fig_size=(8, 6),
-            )
-            if use_sensitivity or use_infidelity:
-                ax[0].set_xlabel(
-                    f"Infidelity: {'{0:.6f}'.format(inf_value)}\n Sensitivity: {'{0:.6f}'.format(sens_value)}"
+
+            if render:
+                fig, ax = viz.visualize_image_attr_multiple(
+                    np.transpose(attr_data, (1, 2, 0)),
+                    np.transpose(inv_input.squeeze().cpu().detach().numpy(), (1, 2, 0)),
+                    ["original_image", "heat_map"],
+                    ["all", "positive"],
+                    titles=["original_image", "heat_map"],
+                    cmap=default_cmap,
+                    show_colorbar=True,
+                    use_pyplot=False,
+                    fig_size=(8, 6),
                 )
-            fig.suptitle(
-                f"True: {classes_map[str(label.numpy()[0])][0]}, Pred: {classes_map[str(pred_label_idx.item())][0]}\nScore: {'{0:.4f}'.format(prediction_score)}",
-                fontsize=16,
-            )
-            fig.savefig(
-                os.path.join(
-                    out_folder,
-                    f"{str(pbar.n)}-{str(label.numpy()[0])}-rotation-{str(ROTATIONS[rotation_count])}-{classes_map[str(label.numpy()[0])][0]}-{classes_map[str(pred_label_idx.item())][0]}.png",
+                if use_sensitivity or use_infidelity:
+                    ax[0].set_xlabel(
+                        f"Infidelity: {'{0:.6f}'.format(inf_value)}\n Sensitivity: {'{0:.6f}'.format(sens_value)}"
+                    )
+                fig.suptitle(
+                    f"True: {classes_map[str(label.numpy()[0])][0]}, Pred: {classes_map[str(pred_label_idx.item())][0]}\nScore: {'{0:.4f}'.format(prediction_score)}",
+                    fontsize=16,
                 )
-            )
-            plt.close(fig)
+                fig.savefig(
+                    os.path.join(
+                        out_folder,
+                        f"{str(pbar.n)}-{str(label.numpy()[0])}-rotation-{str(ROTATIONS[rotation_count])}-{classes_map[str(label.numpy()[0])][0]}-{classes_map[str(pred_label_idx.item())][0]}.png",
+                    )
+                )
+                plt.close(fig)
             # if pbar.n > 25:
             #     break
 

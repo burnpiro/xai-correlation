@@ -99,6 +99,7 @@ This way you're going to measure results for `resnet18` base models, trained on 
 - `weights`: (optional) path to `.pth` file with saved model, if none pasted then default one is used (`models/saved_models/{model_version}-{dataset}-{train_skip}.pth`)
 - `use_infidelity`: (optional) if flag is set then Infidelity measure is calculated
 - `use_sensitivity`: (optional) if flag is set then Sensitivity measure is calculated
+- `render_results`: (optional) if flag is set then script renders images with attributions (otherwise only SSIM metric is calculated)
 
 
 ## List of Notebooks

@@ -52,7 +52,11 @@ flags.DEFINE_boolean(
     False,
     "(optional) Should calculate sensitivity measure",
 )
-
+flags.DEFINE_boolean(
+    "render_results",
+    False,
+    "(optional) Should render images with attributions",
+)
 
 model_folder = os.path.join("models", "saved_models")
 out_folder = os.path.join("experiments", "rotation")
@@ -119,6 +123,7 @@ def main(_argv):
                         step=step,
                         use_infidelity=FLAGS.use_infidelity,
                         use_sensitivity=FLAGS.use_sensitivity,
+                        render=FLAGS.render_results,
                     )
 
 
