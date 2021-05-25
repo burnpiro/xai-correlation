@@ -280,7 +280,7 @@ def measure_rotation_model(
             fig.savefig(
                 os.path.join(
                     out_folder,
-                    f"{str(idx)}-{str(label.numpy()[0])}-rotation-{str(ROTATIONS[rotation_count])}-{classes_map[str(label.numpy()[0])][0]}-{classes_map[str(pred_label_idx.item())][0]}.png",
+                    f"{str(idx)}-{str(rotation_count)}-{str(label.numpy()[0])}-rotation-{str(ROTATIONS[rotation_count])}-{classes_map[str(label.numpy()[0])][0]}-{classes_map[str(pred_label_idx.item())][0]}.png",
                 )
             )
             plt.close(fig)
@@ -294,7 +294,6 @@ def measure_rotation_model(
             "{0:.8f}".format(score_for_true_label),
         ]
 
-        idx += 1
         data_range_for_current_set = MAX_ATT_VALUES[model_version][method][dataset]
         rotation_count += 1
         if rotation_count >= len(ROTATIONS):
@@ -319,6 +318,7 @@ def measure_rotation_model(
             scores.append(ssims)
             rotation_count = 0
             predicted_main_class = 0
+            idx += 1
 
     pbar.close()
 

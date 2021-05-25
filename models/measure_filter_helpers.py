@@ -284,7 +284,7 @@ def measure_filter_model(
             fig.savefig(
                 os.path.join(
                     out_folder,
-                    f"{str(idx)}-{str(label.numpy()[0])}-{str(OUR_FILTERS[filter_count])}-{classes_map[str(label.numpy()[0])][0]}-{classes_map[str(pred_label_idx.item())][0]}.png",
+                    f"{str(idx)}-{str(filter_count)}-{str(label.numpy()[0])}-{str(OUR_FILTERS[filter_count])}-{classes_map[str(label.numpy()[0])][0]}-{classes_map[str(pred_label_idx.item())][0]}.png",
                 )
             )
             plt.close(fig)
@@ -297,7 +297,6 @@ def measure_filter_model(
             "{0:.8f}".format(score_for_true_label),
         ]
 
-        idx += 1
         data_range_for_current_set = MAX_ATT_VALUES[model_version][method][dataset]
         filter_count += 1
         if filter_count >= len(OUR_FILTERS):
@@ -319,6 +318,7 @@ def measure_filter_model(
             scores.append(ssims)
             filter_count = 0
             predicted_main_class = 0
+            idx += 1
 
     pbar.close()
 
