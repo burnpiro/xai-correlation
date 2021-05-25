@@ -28,6 +28,146 @@ PATHS = {
 }
 
 
+"""
+These are max values of the attribution for each model, dataset and XAI method.
+Values are used to calculate SSIM metric (range set)
+"""
+MAX_ATT_VALUES = {
+    "resnet18": {
+        "ig": {
+            "edible-plants": 0.4219718961032256,
+            "food101": 1.3068271111898995,
+            "marvel": 0.6114985791971517,
+            "plant-data": 0.8875898804991542,
+            "stanford-dogs": 1.565911949753198,
+        },
+        "saliency": {
+            "edible-plants": 0.047666743,
+            "food101": 0.045500886,
+            "marvel": 0.067406125,
+            "plant-data": 0.09445625,
+            "stanford-dogs": 0.06071159,
+        },
+        "gradcam": {
+            "edible-plants": 4.7747493e-05,
+            "food101": 5.173298e-05,
+            "marvel": 2.2187825e-05,
+            "plant-data": 8.525976e-05,
+            "stanford-dogs": 6.481426e-05,
+        },
+        "deconv": {
+            "edible-plants": 0.7846228,
+            "food101": 0.42328534,
+            "marvel": 0.4730295,
+            "plant-data": 0.6825042,
+            "stanford-dogs": 1.2834907,
+        },
+        "gradshap": {
+            "edible-plants": 0.14540403,
+            "food101": 0.09303524,
+            "marvel": 0.10294731,
+            "plant-data": 0.28507224,
+            "stanford-dogs": 0.14786015,
+        },
+        "gbp": {
+            "edible-plants": 0.07977496,
+            "food101": 0.06918508,
+            "marvel": 0.050991096,
+            "plant-data": 0.12655339,
+            "stanford-dogs": 0.15254599,
+        },
+    },
+    "efficientnet": {
+        "ig": {
+            "edible-plants": 0.732469091840906,
+            "food101": 5.059399982141479,
+            "marvel": 0.8100544955941875,
+            "plant-data": 1.5519129716309399,
+            "stanford-dogs": 2.329165646284462,
+        },
+        "saliency": {
+            "edible-plants": 0.0950807,
+            "food101": 0.03225366,
+            "marvel": 0.043658517,
+            "plant-data": 0.14042623,
+            "stanford-dogs": 0.13611607,
+        },
+        "gradcam": {
+            "edible-plants": 2.8511127e-05,
+            "food101": 5.288464e-06,
+            "marvel": 7.162203e-06,
+            "plant-data": 4.2028296e-05,
+            "stanford-dogs": 3.7838756e-05,
+        },
+        "deconv": {
+            "edible-plants": 0.07810705,
+            "food101": 0.025042508,
+            "marvel": 0.03060332,
+            "plant-data": 0.055335294,
+            "stanford-dogs": 0.071512155,
+        },
+        "gradshap": {
+            "edible-plants": 0.46427202,
+            "food101": 0.05429075,
+            "marvel": 0.15411238,
+            "plant-data": 0.28000546,
+            "stanford-dogs": 0.35282397,
+        },
+        "gbp": {
+            "edible-plants": 0.06873036,
+            "food101": 0.037462484,
+            "marvel": 0.03062273,
+            "plant-data": 0.06607512,
+            "stanford-dogs": 0.10210772,
+        },
+    },
+    "densenet": {
+        "ig": {
+            "edible-plants": 1.0996446153964408,
+            "food101": 2.577734753749909,
+            "marvel": 0.9976569403028434,
+            "plant-data": 0.8164210705052278,
+            "stanford-dogs": 2.090753485803276,
+        },
+        "saliency": {
+            "edible-plants": 0.06872059,
+            "food101": 0.048571102,
+            "marvel": 0.052243587,
+            "plant-data": 0.06894232,
+            "stanford-dogs": 0.14973614,
+        },
+        "gradcam": {
+            "edible-plants": 0.00027889787,
+            "food101": 0.00018727055,
+            "marvel": 0.0005107261,
+            "plant-data": 0.00039552862,
+            "stanford-dogs": 0.0021067497,
+        },
+        "deconv": {
+            "edible-plants": 4677.1177,
+            "food101": 80.11916,
+            "marvel": 3037.732,
+            "plant-data": 1715.9393,
+            "stanford-dogs": 2044.188,
+        },
+        "gradshap": {
+            "edible-plants": 0.14207457,
+            "food101": 0.11977849,
+            "marvel": 0.16221623,
+            "plant-data": 0.14339326,
+            "stanford-dogs": 0.34582284,
+        },
+        "gbp": {
+            "edible-plants": 0.40056002,
+            "food101": 0.21894407,
+            "marvel": 0.51246065,
+            "plant-data": 0.7207382,
+            "stanford-dogs": 1.5651536,
+        },
+    },
+}
+
+
 def get_default_transformation():
     return transforms.Compose(
         [
