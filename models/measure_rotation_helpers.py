@@ -100,7 +100,7 @@ def measure_rotation_model(
         rotate=True,
     )
     data_loader = torch.utils.data.DataLoader(
-        test_dataset, batch_size=1, shuffle=False, num_workers=4
+        test_dataset, batch_size=1, shuffle=False, num_workers=1
     )
 
     try:
@@ -169,6 +169,8 @@ def measure_rotation_model(
     ROTATIONS = [0, -30, -15, 15, 30]
     rotation_attrs = {rot: [] for rot in ROTATIONS}
     predicted_main_class = 0
+    idx = 0
+
     for input, label in data_loader:
         pbar.update(1)
         inv_input = invTrans(input)
@@ -251,71 +253,72 @@ def measure_rotation_model(
         else:
             sens_value = 0
 
-        if pbar.n in image_ids:
-            rotation = test_dataset.data.iloc[pbar.n]["rotation"]
-            attr_data = attributions.squeeze().cpu().detach().numpy()
+        # if pbar.n in image_ids:
+        # rotation = test_dataset.data.iloc[pbar.n]["rotation"]
+        attr_data = attributions.squeeze().cpu().detach().numpy()
 
-            if render:
-                fig, ax = viz.visualize_image_attr_multiple(
-                    np.transpose(attr_data, (1, 2, 0)),
-                    np.transpose(inv_input.squeeze().cpu().detach().numpy(), (1, 2, 0)),
-                    ["original_image", "heat_map"],
-                    ["all", "positive"],
-                    titles=["original_image", "heat_map"],
-                    cmap=default_cmap,
-                    show_colorbar=True,
-                    use_pyplot=False,
-                    fig_size=(8, 6),
+        if render:
+            fig, ax = viz.visualize_image_attr_multiple(
+                np.transpose(attr_data, (1, 2, 0)),
+                np.transpose(inv_input.squeeze().cpu().detach().numpy(), (1, 2, 0)),
+                ["original_image", "heat_map"],
+                ["all", "positive"],
+                titles=["original_image", "heat_map"],
+                cmap=default_cmap,
+                show_colorbar=True,
+                use_pyplot=False,
+                fig_size=(8, 6),
+            )
+            if use_sensitivity or use_infidelity:
+                ax[0].set_xlabel(
+                    f"Infidelity: {'{0:.6f}'.format(inf_value)}\n Sensitivity: {'{0:.6f}'.format(sens_value)}"
                 )
-                if use_sensitivity or use_infidelity:
-                    ax[0].set_xlabel(
-                        f"Infidelity: {'{0:.6f}'.format(inf_value)}\n Sensitivity: {'{0:.6f}'.format(sens_value)}"
-                    )
-                fig.suptitle(
-                    f"True: {classes_map[str(label.numpy()[0])][0]}, Pred: {classes_map[str(pred_label_idx.item())][0]}\nScore: {'{0:.4f}'.format(prediction_score)}",
-                    fontsize=16,
+            fig.suptitle(
+                f"True: {classes_map[str(label.numpy()[0])][0]}, Pred: {classes_map[str(pred_label_idx.item())][0]}\nScore: {'{0:.4f}'.format(prediction_score)}",
+                fontsize=16,
+            )
+            fig.savefig(
+                os.path.join(
+                    out_folder,
+                    f"{str(idx)}-{str(label.numpy()[0])}-rotation-{str(ROTATIONS[rotation_count])}-{classes_map[str(label.numpy()[0])][0]}-{classes_map[str(pred_label_idx.item())][0]}.png",
                 )
-                fig.savefig(
-                    os.path.join(
-                        out_folder,
-                        f"{str(pbar.n)}-{str(label.numpy()[0])}-rotation-{str(ROTATIONS[rotation_count])}-{classes_map[str(label.numpy()[0])][0]}-{classes_map[str(pred_label_idx.item())][0]}.png",
-                    )
+            )
+            plt.close(fig)
+        # if pbar.n > 25:
+        #     break
+
+        score_for_true_label = output.cpu().detach().numpy()[0][predicted_main_class]
+
+        rotation_attrs[ROTATIONS[rotation_count]] = [
+            np.moveaxis(attr_data, 0, -1),
+            "{0:.8f}".format(score_for_true_label),
+        ]
+
+        idx += 1
+        data_range_for_current_set = MAX_ATT_VALUES[model_version][method][dataset]
+        rotation_count += 1
+        if rotation_count >= len(ROTATIONS):
+            ssims = []
+            for rot in ROTATIONS:
+                rotated_attr = ndimage.rotate(
+                    rotation_attrs[0][0], rot, reshape=False
                 )
-                plt.close(fig)
-            # if pbar.n > 25:
-            #     break
-
-            score_for_true_label = output.cpu().detach().numpy()[0][predicted_main_class]
-
-            rotation_attrs[ROTATIONS[rotation_count]] = [
-                np.moveaxis(attr_data, 0, -1),
-                "{0:.8f}".format(score_for_true_label),
-            ]
-
-            data_range_for_current_set = MAX_ATT_VALUES[model_version][method][dataset]
-            rotation_count += 1
-            if rotation_count >= len(ROTATIONS):
-                ssims = []
-                for rot in ROTATIONS:
-                    rotated_attr = ndimage.rotate(
-                        rotation_attrs[0][0], rot, reshape=False
-                    )
-                    ssims.append(
-                        "{0:.8f}".format(
-                            ssim(
-                                rotated_attr,
-                                rotation_attrs[rot][0],
-                                win_size=11,
-                                data_range=data_range_for_current_set,
-                                multichannel=True,
-                            )
+                ssims.append(
+                    "{0:.8f}".format(
+                        ssim(
+                            rotated_attr,
+                            rotation_attrs[rot][0],
+                            win_size=11,
+                            data_range=data_range_for_current_set,
+                            multichannel=True,
                         )
                     )
-                    ssims.append(rotation_attrs[rot][1])
+                )
+                ssims.append(rotation_attrs[rot][1])
 
-                scores.append(ssims)
-                rotation_count = 0
-                predicted_main_class = 0
+            scores.append(ssims)
+            rotation_count = 0
+            predicted_main_class = 0
 
     pbar.close()
 

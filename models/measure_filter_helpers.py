@@ -173,6 +173,7 @@ def measure_filter_model(
         "fx_mighty_details 25,1,25,1,11,0",
         "sharpen 300",
     ]
+    idx = 0
     filter_count = 0
     filter_attrs = {filter_name: [] for filter_name in OUR_FILTERS}
     predicted_main_class = 0
@@ -258,66 +259,66 @@ def measure_filter_model(
         else:
             sens_value = 0
 
-        if pbar.n in image_ids:
-            filter_name = test_dataset.data.iloc[pbar.n]["filter"].split(" ")[0]
-            attr_data = attributions.squeeze().cpu().detach().numpy()
-            if render:
-                fig, ax = viz.visualize_image_attr_multiple(
-                    np.transpose(attr_data, (1, 2, 0)),
-                    np.transpose(inv_input.squeeze().cpu().detach().numpy(), (1, 2, 0)),
-                    ["original_image", "heat_map"],
-                    ["all", "positive"],
-                    titles=["original_image", "heat_map"],
-                    cmap=default_cmap,
-                    show_colorbar=True,
-                    use_pyplot=False,
-                    fig_size=(8, 6),
+        # filter_name = test_dataset.data.iloc[pbar.n]["filter"].split(" ")[0]
+        attr_data = attributions.squeeze().cpu().detach().numpy()
+        if render:
+            fig, ax = viz.visualize_image_attr_multiple(
+                np.transpose(attr_data, (1, 2, 0)),
+                np.transpose(inv_input.squeeze().cpu().detach().numpy(), (1, 2, 0)),
+                ["original_image", "heat_map"],
+                ["all", "positive"],
+                titles=["original_image", "heat_map"],
+                cmap=default_cmap,
+                show_colorbar=True,
+                use_pyplot=False,
+                fig_size=(8, 6),
+            )
+            if use_sensitivity or use_infidelity:
+                ax[0].set_xlabel(
+                    f"Infidelity: {'{0:.6f}'.format(inf_value)}\n Sensitivity: {'{0:.6f}'.format(sens_value)}"
                 )
-                if use_sensitivity or use_infidelity:
-                    ax[0].set_xlabel(
-                        f"Infidelity: {'{0:.6f}'.format(inf_value)}\n Sensitivity: {'{0:.6f}'.format(sens_value)}"
-                    )
-                fig.suptitle(
-                    f"True: {classes_map[str(label.numpy()[0])][0]}, Pred: {classes_map[str(pred_label_idx.item())][0]}\nScore: {'{0:.4f}'.format(prediction_score)}",
-                    fontsize=16,
+            fig.suptitle(
+                f"True: {classes_map[str(label.numpy()[0])][0]}, Pred: {classes_map[str(pred_label_idx.item())][0]}\nScore: {'{0:.4f}'.format(prediction_score)}",
+                fontsize=16,
+            )
+            fig.savefig(
+                os.path.join(
+                    out_folder,
+                    f"{str(idx)}-{str(label.numpy()[0])}-{str(OUR_FILTERS[filter_count])}-{classes_map[str(label.numpy()[0])][0]}-{classes_map[str(pred_label_idx.item())][0]}.png",
                 )
-                fig.savefig(
-                    os.path.join(
-                        out_folder,
-                        f"{str(pbar.n)}-{str(label.numpy()[0])}-{str(OUR_FILTERS[filter_count])}-{classes_map[str(label.numpy()[0])][0]}-{classes_map[str(pred_label_idx.item())][0]}.png",
-                    )
-                )
-                plt.close(fig)
-            # if pbar.n > 25:
-            #     break
-            score_for_true_label = output.cpu().detach().numpy()[0][predicted_main_class]
+            )
+            plt.close(fig)
+        # if pbar.n > 25:
+        #     break
+        score_for_true_label = output.cpu().detach().numpy()[0][predicted_main_class]
 
-            filter_attrs[OUR_FILTERS[filter_count]] = [
-                np.moveaxis(attr_data, 0, -1),
-                "{0:.8f}".format(score_for_true_label),
-            ]
+        filter_attrs[OUR_FILTERS[filter_count]] = [
+            np.moveaxis(attr_data, 0, -1),
+            "{0:.8f}".format(score_for_true_label),
+        ]
 
-            data_range_for_current_set = MAX_ATT_VALUES[model_version][method][dataset]
-            filter_count += 1
-            if filter_count >= len(OUR_FILTERS):
-                ssims = []
-                for rot in OUR_FILTERS:
-                    ssims.append(
-                        "{0:.8f}".format(
-                            ssim(
-                                filter_attrs["none"][0],
-                                filter_attrs[rot][0],
-                                win_size=11,
-                                data_range=data_range_for_current_set,
-                                multichannel=True,
-                            )
+        idx += 1
+        data_range_for_current_set = MAX_ATT_VALUES[model_version][method][dataset]
+        filter_count += 1
+        if filter_count >= len(OUR_FILTERS):
+            ssims = []
+            for rot in OUR_FILTERS:
+                ssims.append(
+                    "{0:.8f}".format(
+                        ssim(
+                            filter_attrs["none"][0],
+                            filter_attrs[rot][0],
+                            win_size=11,
+                            data_range=data_range_for_current_set,
+                            multichannel=True,
                         )
                     )
-                    ssims.append(filter_attrs[rot][1])
+                )
+                ssims.append(filter_attrs[rot][1])
 
-                scores.append(ssims)
-                filter_count = 0
-                predicted_main_class = 0
+            scores.append(ssims)
+            filter_count = 0
+            predicted_main_class = 0
 
     pbar.close()
 

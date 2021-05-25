@@ -54,7 +54,7 @@ python measure_model.py --model_version=efficientnet --method=saliency --method=
 ```
 
 ##### Parameters:
-- `model_version`: version of the model [`resnet18`, `resnet50`, `efficientnet`]
+- `model_version`: version of the model [`resnet18`, `resnet50`, `efficientnet`, `densenet`]
 - `dataset`: (optional) version of the dataset [`edible-plants`, `food101`, `marvel`, `plant-data`, `stanford-dogs`] if `None` then all versions are tested (`--weights` parameter is ignored)
 - `train_skip`: (optional, default `None`) version of the train dataset size [`100%`, `80%`, `60%`, `40%`, `20%`], if `None` then all versions are tested (`--weights` parameter is ignored)
   - `method`: method to test [`ig`, `saliency`, `gradcam`, `deconv`, `gradshap`, `gbp`]
@@ -90,7 +90,7 @@ python test_rotation.py --model_version=resnet18 --dataset=edible-plants --datas
 This way you're going to measure results for `resnet18` base models, trained on `80%` and `100%` of `ediable-plants` and `marvel` datasets. Tests will be done using `Integrated Gradiens` and `GradCAM` methods. At the end you'll run `1 x 2 x 2 x 2 = 8 processes`.
 
 ##### Parameters:
-- `model_version`: version of the model [`resnet18`, `resnet50`, `efficientnet`]
+- `model_version`: version of the model [`resnet18`, `resnet50`, `efficientnet`, `densenet`]
 - `dataset`: (optional) version of the dataset [`edible-plants`, `food101`, `marvel`, `plant-data`, `stanford-dogs`] if `None` then all versions are tested (`--weights` parameter is ignored)
 - `train_skip`: (optional, default `None`) version of the train dataset size [`100%`, `80%`, `60%`, `40%`, `20%`], if `None` then all versions are tested (`--weights` parameter is ignored)
   - `method`: method to test [`ig`, `saliency`, `gradcam`, `deconv`, `gradshap`, `gbp`]

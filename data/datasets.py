@@ -459,8 +459,9 @@ class CustomDataset(Dataset):
             for rotation in [0, -30, -15, 15, 30]:
                 df1 = self.data.copy()
                 df1["rotation"] = str(rotation)
-                new_df = pd.concat([new_df, df1], ignore_index=True)
-                new_df = new_df.sort_values(by=['image'], ignore_index=True)
+                new_df = pd.concat([new_df, df1], ignore_index=False)
+                new_df = new_df.reset_index().sort_values(by=['image', 'index'], ignore_index=True).set_index('index')
+                new_df = new_df.reset_index(drop=True)
 
             self.data = new_df
 
@@ -478,8 +479,9 @@ class CustomDataset(Dataset):
             ]:
                 df1 = self.data.copy()
                 df1["filter"] = str(filter)
-                new_df = pd.concat([new_df, df1], ignore_index=True)
-                new_df = new_df.sort_values(by=['image'], ignore_index=True)
+                new_df = pd.concat([new_df, df1], ignore_index=False)
+                new_df = new_df.reset_index().sort_values(by=['image', 'index'], ignore_index=True).set_index('index')
+                new_df = new_df.reset_index(drop=True)
 
             self.data = new_df
 
