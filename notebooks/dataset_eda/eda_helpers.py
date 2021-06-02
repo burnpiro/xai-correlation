@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 
 
-def plot_bargraph_with_groupings(df, groupby, title, xlabel, ylabel):
+def plot_bargraph_with_groupings(df, groupby, title, xlabel, ylabel, figsize=(10,20)):
     """
     Plots a dataframe showing the frequency of datapoints grouped by one column and coloured by another.
     df : dataframe
@@ -20,7 +20,7 @@ def plot_bargraph_with_groupings(df, groupby, title, xlabel, ylabel):
     ax = (
         df[groupby]
         .value_counts()
-        .plot(kind="barh", figsize=(20,20), title=title)
+        .plot(kind="barh", figsize=figsize, title=title)
     )
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
