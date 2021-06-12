@@ -38,6 +38,11 @@ flags.DEFINE_multi_enum(
     f"(optional) select on of available methods: {list(METHODS.keys())}",
 )
 flags.DEFINE_string(
+    "image_ids",
+    None,
+    "(optional) List of ids, comma separated",
+)
+flags.DEFINE_string(
     "weights",
     None,
     "(optional) Dataset path to saved model",
@@ -77,6 +82,10 @@ def main(_argv):
     methods = METHODS.values()
     if len(FLAGS.method) > 0:
         methods = [METHODS[method] for method in FLAGS.method]
+
+    ids = None
+    if FLAGS.image_ids is not None:
+        ids = [int(x) for x in FLAGS.image_ids.split(',')]
 
     for model_version in FLAGS.model_version:
         for dataset in datasets:
@@ -124,6 +133,7 @@ def main(_argv):
                         use_infidelity=FLAGS.use_infidelity,
                         use_sensitivity=FLAGS.use_sensitivity,
                         render=FLAGS.render_results,
+                        ids=ids,
                     )
 
 

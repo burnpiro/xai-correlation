@@ -415,6 +415,7 @@ class CustomDataset(Dataset):
         skip=None,
         rotate=False,
         add_filters=False,
+        ids=None,
     ):
         """
         Args:
@@ -426,6 +427,8 @@ class CustomDataset(Dataset):
             step (int, optional): if different than 1 then data is iterated with given step
             skip (List[int], optional): if set then skipping every nth element
             rotate (boolean, optional): create sample rotation images
+            add_filters (boolean, optional): create sample augmentations with filters images
+            ids (List[int], optional): list of ids from the dataset to extract (skip and step doesn't work if ids are provided)
         """
         if dataset == DATASETS["edible-plants"]:
             train_df, test_df = get_edible_plants_data(
@@ -452,6 +455,10 @@ class CustomDataset(Dataset):
             for skip_val in skip:
                 self.data = self.data.drop(self.data.iloc[::skip_val].index, 0)
         self.transformer = transformer
+
+        if ids is not None:
+            self.data = train_df if data_type == "train" else test_df
+            self.data = self.data.loc[self.data.index.isin(ids)]
 
         self.rotate = rotate
         if rotate:

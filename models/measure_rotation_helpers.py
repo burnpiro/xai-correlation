@@ -71,6 +71,7 @@ def measure_rotation_model(
     use_infidelity=False,
     use_sensitivity=False,
     render=False,
+    ids=None,
 ):
     invTrans = get_inverse_normalization_transformation()
     data_dir = os.path.join("data")
@@ -98,6 +99,7 @@ def measure_rotation_model(
         root_dir=data_dir,
         step=step,
         rotate=True,
+        ids=ids,
     )
     data_loader = torch.utils.data.DataLoader(
         test_dataset, batch_size=1, shuffle=False, num_workers=1
